@@ -56,12 +56,28 @@ class Material {
    * This can be used both for attributes and uniforms.
    * Optionally, you may want to not [clobber] an existing value.
    */
-  void setLayerVariable(String layerName, String variableName, value,
-                        {bool clobber: true}) {
+  void setVariable(String layerName, String variableName, value,
+                   {bool clobber: true}) {
     MaterialLayer layer = getLayer(layerName); // also checks existence of layer
     _setLayerVariable(layer, variableName, value, clobber: clobber);
   }
 
+  /**
+   * Sets [layer]'s [variableName] to [value].
+   * This can be used both for attributes and uniforms.
+   * Optionally, you may want to not [clobber] an existing value.
+   */
+  void setLayerVariable(MaterialLayer layer, String variableName, value,
+                        {bool clobber: true}) {
+    _setLayerVariable(layer, variableName, value, clobber: clobber);
+  }
+
+  /**
+   * Sets [layer]'s variables according to [valuesMap], which maps
+   * variable names to the values you want to set them to.
+   * This can be used both for attributes and uniforms.
+   * Optionally, you may want to not [clobber] existing variables.
+   */
   void setLayerVariables(MaterialLayer layer, Map<String, dynamic> valuesMap,
                          {bool clobber: true}) {
     for (String variableName in valuesMap.keys) {
@@ -70,7 +86,7 @@ class Material {
     }
   }
 
-
+  // unsure about this
   bool _areLayersSetup = false;
   void setupLayersIfNecessary(World world, Model model, Renderer renderer) {
     if (! _areLayersSetup) {
@@ -117,11 +133,11 @@ class Material {
     return uniforms;
   }
 
+  // this may be supported in the future, thus negating the need for this.
   void _checkLayersUnicity() {
     List<String> uniqueIds = [];
     for (MaterialLayer layer in layers) {
       if (uniqueIds.contains(layer.uid)) {
-        // this may be supported in the future, thus negating the need for this.
         throw new UnsupportedError("${name} contains more than 1 ${layer.uid}");
       }
       uniqueIds.add(layer.uid);

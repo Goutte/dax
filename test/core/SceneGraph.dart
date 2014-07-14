@@ -1,4 +1,4 @@
-library dax_tests;
+library dax_tests_scene_graph;
 
 import 'package:unittest/unittest.dart';
 

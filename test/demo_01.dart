@@ -79,8 +79,8 @@ main() {
   world.add(square);
 
   // Make the square blue
-  square.material.setLayerVariable('ColorLayer', 'uColor', [0.0, 0.0, 1.0]);
-  square.material.setLayerVariable('ColorLayer', 'uAlpha', 0.5);
+  square.material.setVariable('ColorLayer', 'uColor', [0.0, 0.0, 1.0]);
+  square.material.setVariable('ColorLayer', 'uAlpha', 0.5);
 
   // this is automatically set -- bind this to onResize
   // gl.viewport(0, 0, canvas.width, canvas.height);
