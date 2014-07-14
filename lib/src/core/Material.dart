@@ -194,13 +194,3 @@ class Material {
 
 }
 
-
-class DefaultMaterial extends Material {
-
-  DefaultMaterial() : super() {
-    layers.add(new PositionLayer());
-    layers.add(new ColorLayer());
-  }
-
-}
-
