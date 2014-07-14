@@ -17,31 +17,19 @@ import '../lib/dax.dart';
 
 class SingleTriangleModel extends Model {
 
-  Mesh _mesh;
-  Material _material;
-
+  Mesh _mesh = new StupidTriangleMesh();
   Mesh get mesh => _mesh;
-  Material get material => _material;
 
-  SingleTriangleModel() {
-    _mesh = new StupidTriangleMesh();
-    _material = new DefaultMaterial();
-  }
+  SingleTriangleModel();
 
 }
 
 class UnitSquareModel extends Model {
 
-  Mesh _mesh;
-  Material _material;
-
+  Mesh _mesh = new SquareMesh();
   Mesh get mesh => _mesh;
-  Material get material => _material;
 
-  UnitSquareModel() {
-    _mesh = new UnitSquareMesh();
-    _material = new DefaultMaterial();
-  }
+  UnitSquareModel();
 
 }
 

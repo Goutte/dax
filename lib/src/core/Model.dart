@@ -12,4 +12,9 @@ part of dax;
  * such as initial scene set-up and processing of user input,
  * models handle nearly everything else.
  */
-class Model extends SpatialSceneNode implements Renderable, Shadable {}
+class Model extends SpatialSceneNode implements Renderable, Shadable {
+
+  Material _material = new DefaultMaterial();
+  Material get material => _material;
+
+}

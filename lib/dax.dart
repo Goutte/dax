@@ -27,6 +27,9 @@ part 'src/layer/PositionLayer.dart';
 
 part 'src/material/DefaultMaterial.dart';
 
+part 'src/mesh/StupidTriangleMesh.dart';
+part 'src/mesh/SquareMesh.dart';
+
 
 
 
