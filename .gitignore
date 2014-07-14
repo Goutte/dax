@@ -1,0 +1,10 @@
+
+# IntellijIdea
+*.idea
+
+# Pub
+pubspec.lock
+packages
+packages/*
+test/packages
+test/packages/*

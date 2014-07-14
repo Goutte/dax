@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Dax Demo #01</title>
+    <script type="application/dart" src="demo_01.dart"></script>
+    <style>
+      body {
+        width: 600px;
+        margin: 0 auto;
+      }
+      h1 {
+        text-align: center;
+      }
+      canvas {
+        border: 1px solid black;
+        display: block;
+        margin: 0 auto;
+      }
+      #stats {
+        position: absolute;
+        top:  10px;
+        left: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Dax Demo #01</h1>
+    <p>
+      You should see below a white triangle and a transparent blue square.
+      <a id="showStatsButton" href="?fps">Show Stats.</a>
+    </p>
+    <canvas id="demoCanvas" width="500" height="500"></canvas>
+    <p>
+      This demo showcases :
+      <ul>
+        <li>Models with simple meshes and default materials</li>
+        <li>The PositionLayer shader</li>
+        <li>The ColorLayer shader</li>
+        <li>The (dumb) material shader preprocessor</li>
+        <li>Rotations of models</li>
+      </ul>
+      <pre>
+        <code>
+          World world = new World();
+
+          Model triangle = new SingleTriangleModel();
+          world.add(triangle);
+
+          Model square = new UnitSquareModel();
+          world.add(square);
+
+          square.material.setLayerVariable('ColorLayer', 'uColor', [0.0, 0.0, 1.0]);
+          square.material.setLayerVariable('ColorLayer', 'uAlpha', 0.5);
+        </code>
+      </pre>
+    </p>
+  </body>
+</html>
