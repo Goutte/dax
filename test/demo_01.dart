@@ -1,4 +1,4 @@
-library dax_demo;
+library dax_demo01;
 
 import 'dart:math';
 import 'dart:html';
@@ -8,6 +8,7 @@ import 'dart:typed_data';
 import 'package:vector_math/vector_math.dart';
 import 'package:stats/stats.dart';
 
+import 'demo_utils.dart';
 import '../lib/dax.dart';
 
 
@@ -46,7 +47,6 @@ main() {
   if (trackFrameRate) {
     querySelector("#showStatsButton").remove();
     document.body.children.add(stats.container);
-  } else {
   }
 
   // Get the WebGL RenderingContext from CanvasElement
@@ -104,28 +104,3 @@ main() {
 
 }
 
-
-
-/// UTILS ----------------------------------------------------------------------
-
-/**
- * Parse and store the URL parameters for start up.
- */
-Map parseQueryString() {
-  Map urlParameters = {};
-  String search = window.location.search;
-  if (search.startsWith("?")) {
-    search = search.substring(1);
-  }
-  List<String> params = search.split("&");
-  for (String param in params) {
-    List<String> pair = param.split("=");
-    if (pair.length == 1) {
-      urlParameters[pair[0]] = "";
-    } else {
-      urlParameters[pair[0]] = pair[1];
-    }
-  }
-
-  return urlParameters;
-}

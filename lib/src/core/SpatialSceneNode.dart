@@ -29,10 +29,10 @@ class SpatialSceneNode extends SceneNode {
   Matrix4 _matrix = new Matrix4.identity();
   Matrix4 _inverseMatrix = new Matrix4.identity();
 
-  /// Unitary vectors for convenience -- maybe they should be more "global" ?
-  Vector3 _unitX = new Vector3(1.0, 0.0, 0.0);
-  Vector3 _unitY = new Vector3(0.0, 1.0, 0.0);
-  Vector3 _unitZ = new Vector3(0.0, 0.0, 1.0);
+  /// Unitary vectors for convenience -- PROTECTED attributes, not really public
+  Vector3 unitX = new Vector3(1.0, 0.0, 0.0);
+  Vector3 unitY = new Vector3(0.0, 1.0, 0.0);
+  Vector3 unitZ = new Vector3(0.0, 0.0, 1.0);
   /// Position of origin
   Vector3 _origin = new Vector3(0.0, 0.0, 0.0);
 
@@ -142,21 +142,21 @@ class SpatialSceneNode extends SceneNode {
 
   Vector3 _getUp() {
     if (_shouldRecalculate(FLAG_UP)) {
-      toWorld3(_up, _unitY);
+      toWorld3(_up, unitY);
     }
     return _up;
   }
 
   Vector3 _getRight() {
     if (_shouldRecalculate(FLAG_RIGHT)) {
-      toWorld3(_right, _unitX);
+      toWorld3(_right, unitX);
     }
     return _right;
   }
 
   Vector3 _getDirection() {
     if (_shouldRecalculate(FLAG_DIRECTION)) {
-      toWorld3(_direction, _unitZ * -1);
+      toWorld3(_direction, unitZ * -1);
     }
     return _direction;
   }

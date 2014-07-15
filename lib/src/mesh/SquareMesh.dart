@@ -17,9 +17,9 @@ part of dax;
  */
 class SquareMesh extends TrianglesMesh {
 
-  List<num> _vertices;
+  List<double> _vertices;
 
-  List<num> get vertices => _vertices;
+  List<double> get vertices => _vertices;
 
   SquareMesh({num size: 1.0}) {
     _vertices = [
@@ -31,7 +31,7 @@ class SquareMesh extends TrianglesMesh {
          0.5,  0.5,  0.0, // B
         -0.5, -0.5,  0.0, // D
     ];
-    _vertices = new List<num>.generate(_vertices.length,
+    _vertices = new List<double>.generate(_vertices.length,
         (int index) => _vertices[index] * size);
   }
 

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Dax Demo #02</title>
+    <script type="application/dart" src="demo_02.dart"></script>
+    <style>
+      body {
+        width: 600px;
+        margin: 0 auto;
+      }
+      h1 {
+        text-align: center;
+      }
+      canvas {
+        border: 1px solid black;
+        display: block;
+        margin: 0 auto;
+      }
+      #stats {
+        position: absolute;
+        top:  10px;
+        left: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Dax Demo #02</h1>
+    <p>
+      You should see below a spinning white square.
+      <a id="showStatsButton" href="?fps">Show Stats.</a>
+    </p>
+    <canvas id="demoCanvas" width="500" height="500"></canvas>
+    <p>
+      This demo showcases :
+      <ul>
+        <li>The Controller</li>
+        <li>The Model's <code>update()</code> method</li>
+      </ul>
+      <pre>
+        <code>
+/**
+ * A simple square model, that spins around its Y axis.
+ */
+class DemoSquareModel extends Model {
+  Mesh _mesh = new SquareMesh();
+  Mesh get mesh => _mesh;
+
+  void update(num time, num delta) {
+    rotate(delta*O/2000, unitY);
+  }
+}
+
+/**
+ * We define our Demo Controller that will set up the world's models.
+ */
+class Demo02 extends Controller {
+  Demo02(CanvasElement canvas, Stats stats) : super(canvas, stats: stats) {
+    world.add(new DemoSquareModel());
+  }
+}
+
+// ...
+
+Controller demo = new Demo02(canvas, stats);
+
+demo.startRendering();
+demo.startUpdating();
+        </code>
+      </pre>
+    </p>
+  </body>
+</html>
