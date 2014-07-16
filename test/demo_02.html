@@ -48,6 +48,7 @@ class DemoSquareModel extends Model {
 
   void update(num time, num delta) {
     rotate(delta*O/2000, unitY);
+    setPosition(new Vector3(0.0, sin(time/200), 5*sin(time/900)));
   }
 }
 

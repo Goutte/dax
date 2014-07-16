@@ -26,8 +26,13 @@ abstract class Controller {
   Controller(CanvasElement this.canvas, {Stats this.stats}) {
     // Get the WebGL RenderingContext from the CanvasElement
     gl = canvas.getContext3d(
-        alpha: true, depth: true, stencil: false,
-        antialias: true, premultipliedAlpha: true,
+        // we don't want alpha in the backbuffer, 99% of times
+        alpha: false,
+        // defaults
+        depth: true,
+        stencil: false,
+        antialias: true,
+        premultipliedAlpha: true,
         preserveDrawingBuffer: false
     );
     // Set up the WebGL renderer

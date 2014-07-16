@@ -2,8 +2,6 @@ library dax_demo02;
 
 import 'dart:math';
 import 'dart:html';
-import 'dart:web_gl';
-import 'dart:typed_data';
 
 import 'package:vector_math/vector_math.dart';
 import 'package:stats/stats.dart';
@@ -24,7 +22,7 @@ class DemoSquareModel extends Model {
 
   void update(num time, num delta) {
     rotate(delta*O/2000, unitY);
-//    print(delta);
+    setPosition(new Vector3(0.0, sin(time/200), 5*sin(time/900)));
   }
 }
 
@@ -59,9 +57,5 @@ main() {
 
   demo.startRendering();
   demo.startUpdating();
-
-//  gl.disable(DEPTH_TEST);
-//  gl.blendFunc(SRC_ALPHA, ONE_MINUS_SRC_ALPHA);
-//  gl.enable(BLEND);
 
 }

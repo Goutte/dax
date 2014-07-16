@@ -23,6 +23,7 @@ class Model extends SpatialSceneNode implements Renderable, Shadable {
   /// To override with your own logic.
   /// The [time] since the first render is available, as well as
   /// the [deltaTime] since the last render.
+  /// They're both in milliseconds (i think).
   void update(num time, num deltaTime){}
 
 }
