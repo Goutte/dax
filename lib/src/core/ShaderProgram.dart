@@ -69,7 +69,7 @@ class ShaderProgram {
     var location = attributesLocations[attribute.name];
 
 //    if (!attributesBuffers.containsKey(attribute.name)) {
-    // fixme: don't re-create GL buffer on each draw!
+    // fixme: don't re-create a GL buffer ! instead, cache it using value's HashCode (or something)
     // createBuffer() asks the WebGL system to allocate some data for us
     attributesBuffers[attribute.name] = gl.createBuffer();
     // bindBuffer() tells the WebGL system the target of call to bufferDataTyped
@@ -131,10 +131,21 @@ class ShaderProgram {
             gl.texParameteri(target, WebGL.TEXTURE_MAG_FILTER, WebGL.NEAREST);
             gl.texParameteri(target, WebGL.TEXTURE_MIN_FILTER, WebGL.NEAREST);
 
-            value.upload(gl, handle);
+            try {
+              if (value.isLoaded) {
+                // Upload the texture bitmap data to the GPU.
+                gl.texImage2D(target, 0, WebGL.RGBA, WebGL.RGBA, WebGL.UNSIGNED_BYTE, value.image);
+              } else {
+                //gl.texImage2D(target, 0, WebGL.RGBA, WebGL.RGBA, WebGL.UNSIGNED_BYTE, null);
+                print("Texture's image still not loaded.");
+              }
+            } catch (e) {
+              print('Failed to upload the texture data to the GPU : ${e}');
+            }
+
+            //gl.pixelStorei(WebGL.UNPACK_PREMULTIPLY_ALPHA_WEBGL, WebGL.ONE);
 
 //            gl.pixelStorei GL_UNPACK_FLIP_Y_WEBGL, attrs.flip_y
-//            gl.pixelStorei GL_UNPACK_PREMULTIPLY_ALPHA_WEBGL, attrs.premultiply_alpha
 //            conversion = if attrs.colorspace_conversion then GL_BROWSER_DEFAULT_WEBGL else GL_NONE
 //            gl.pixelStorei GL_UNPACK_COLORSPACE_CONVERSION_WEBGL, conversion
           }

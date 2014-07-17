@@ -2,6 +2,10 @@ part of dax;
 
 
 class Texture {
+  int get target;
+  bool get isLoaded;
+  ElementStream<Event> get onLoad;
+
   Texture();
 }
 
@@ -11,18 +15,14 @@ class BitmapTexture extends Texture {
   ImageElement image;
 
   int get target => WebGL.TEXTURE_2D;
+  bool get isLoaded => _isLoaded;
+  ElementStream<Event> get onLoad => image.onLoad;
 
-  BitmapTexture(ImageElement this.image);
+  bool _isLoaded = false;
 
-  /**
-   * Upload the texture bitmap data to the GPU.
-   */
-  void upload(WebGL.RenderingContext gl, WebGL.Texture handle) {
-    try {
-      gl.texImage2D(target, 0, WebGL.RGBA, WebGL.RGBA, WebGL.UNSIGNED_BYTE, image);
-    } catch (e) {
-      print('Failed to upload the texture data to the GPU : ${e}');
-    }
+  BitmapTexture(ImageElement this.image) {
+    image.onLoad.listen((e){ _isLoaded = true; });
   }
+
 
 }
