@@ -2,9 +2,10 @@ part of dax;
 
 
 /**
- * A Model owns a Mesh that holds geometrical information.
+ * A Mesh belongs to a Model and holds geometrical and texturing information.
  * Responsibilities:
  *   - generate the [vertices] to provide to the gl context during render.
+ *   - generate the [uvs] to provide to the gl context during render of texture.
  * You can implement this however you want.
  */
 abstract class Mesh {
@@ -18,6 +19,11 @@ abstract class Mesh {
 
   /// The number of above [vertices], depending on [drawMode].
   int get verticesCount;
+
+  /// A flat list of [uvs] coordinates, to use with the TextureLayer.
+  /// Each coordinate element is between 0 and 1, the origin being top left.
+  /// If this is left null, the TextureLayer will raise an Error if used.
+  List<double> get uvs => null;
 
 }
 

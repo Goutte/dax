@@ -11,6 +11,7 @@ class ShaderProgram {
   /// For the shader these are read-only variables.
   Map<String, GlslAttribute> attributes = {};
   Map<String, int> attributesLocations = {};
+  Map<String, WebGL.Buffer> attributesBuffers = {};
 
   /// [uniforms] : Global variables that may change per primitive
   /// (and may not be set inside glBegin/glEnd)
@@ -20,6 +21,9 @@ class ShaderProgram {
   Map<String, GlslUniform> uniforms = {};
   Map<String, WebGL.UniformLocation> uniformsLocations = {};
 
+
+  Map<Texture, WebGL.Texture> textures = {};
+
   WebGL.Program program;
   WebGL.Shader fragmentShader, vertexShader;
 
@@ -28,10 +32,6 @@ class ShaderProgram {
                 List<GlslAttribute> attributes,
                 List<GlslUniform> uniforms)
   {
-
-    print("FRAGMENT :\n${fragmentGlsl}");
-    print("VERTEX :\n${vertexGlsl}");
-
     fragmentShader = gl.createShader(WebGL.FRAGMENT_SHADER);
     gl.shaderSource(fragmentShader, fragmentGlsl);
     gl.compileShader(fragmentShader);
@@ -46,7 +46,9 @@ class ShaderProgram {
     gl.linkProgram(program);
 
     if (!gl.getProgramParameter(program, WebGL.LINK_STATUS)) {
-      print("Could not initialize shaders");
+      print("Could not initialize shaders!");
+      print("FRAGMENT :\n${fragmentGlsl}");
+      print("VERTEX :\n${vertexGlsl}");
     }
 
     for (GlslAttribute attribute in attributes) {
@@ -63,12 +65,23 @@ class ShaderProgram {
   }
 
 
-  void setAttribute(WebGL.RenderingContext gl, GlslAttribute variable, value) {
-    var location = attributesLocations[variable.name];
+  void setAttribute(WebGL.RenderingContext gl, GlslAttribute attribute, List value) {
+    var location = attributesLocations[attribute.name];
 
-    gl.bindBuffer(WebGL.ARRAY_BUFFER, value);
+//    if (!attributesBuffers.containsKey(attribute.name)) {
+    // fixme: don't re-create GL buffer on each draw!
+    // createBuffer() asks the WebGL system to allocate some data for us
+    attributesBuffers[attribute.name] = gl.createBuffer();
+    // bindBuffer() tells the WebGL system the target of call to bufferDataTyped
+    gl.bindBuffer(WebGL.ARRAY_BUFFER, attributesBuffers[attribute.name]);
+    gl.bufferDataTyped(WebGL.ARRAY_BUFFER, new Float32List.fromList(value), WebGL.STATIC_DRAW);
+//    }
 
-    return gl.vertexAttribPointer(location, 3, WebGL.FLOAT, false, 0, 0);
+    WebGL.Buffer buffer = attributesBuffers[attribute.name];
+
+    gl.bindBuffer(WebGL.ARRAY_BUFFER, buffer);
+
+    return gl.vertexAttribPointer(location, attribute.size, WebGL.FLOAT, false, 0, 0);
   }
 
   void setUniform(WebGL.RenderingContext gl, GlslUniform variable, value) {
@@ -102,9 +115,35 @@ class ShaderProgram {
         return gl.uniformMatrix3fv(location, false, value);
       case 'mat4':
         return gl.uniformMatrix4fv(location, false, value);
+      case 'sampler2D':
+        if (value is BitmapTexture) {
+          int target = value.target;
+          WebGL.Texture handle;
+          if (textures.containsKey(value)) {
+            handle = textures[value];
+          } else {
+            handle = gl.createTexture();
 
-      // todo : textures !
-//      case 'sampler2D':
+            gl.bindTexture(target, handle);
+
+            gl.texParameteri(target, WebGL.TEXTURE_WRAP_S, WebGL.CLAMP_TO_EDGE);
+            gl.texParameteri(target, WebGL.TEXTURE_WRAP_T, WebGL.CLAMP_TO_EDGE);
+            gl.texParameteri(target, WebGL.TEXTURE_MAG_FILTER, WebGL.NEAREST);
+            gl.texParameteri(target, WebGL.TEXTURE_MIN_FILTER, WebGL.NEAREST);
+
+            value.upload(gl, handle);
+
+//            gl.pixelStorei GL_UNPACK_FLIP_Y_WEBGL, attrs.flip_y
+//            gl.pixelStorei GL_UNPACK_PREMULTIPLY_ALPHA_WEBGL, attrs.premultiply_alpha
+//            conversion = if attrs.colorspace_conversion then GL_BROWSER_DEFAULT_WEBGL else GL_NONE
+//            gl.pixelStorei GL_UNPACK_COLORSPACE_CONVERSION_WEBGL, conversion
+          }
+
+          gl.bindTexture(target, handle);
+          return gl.uniform1i(location, 0); // fixme textureIndex instead of 0
+        } else {
+          throw new ArgumentError("sampler2D must be an instance of BitmapTexture");
+        }
 //      case 'samplerCube':
 //        if (!(value instanceof Jax.Texture) || value.ready()) {
 //          gl.activeTexture(GL_TEXTURE0 + this.__textureIndex);

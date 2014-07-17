@@ -14,11 +14,24 @@ import '../lib/dax.dart';
 /// ----------------------------------------------------------------------------
 
 /**
+ * A simple material that loads the image `texture/goutte.png` as texture.
+ */
+class Demo02Material extends Material {
+  Demo02Material() : super() {
+    layers.add(new PositionLayer());
+    layers.add(new ColorLayer());
+    layers.add(new BitmapTextureLayer(new ImageElement(src: "texture/goutte.png")));
+  }
+}
+
+/**
  * A simple square model, that spins around its Y axis.
  */
 class DemoSquareModel extends Model {
   Mesh _mesh = new SquareMesh();
   Mesh get mesh => _mesh;
+
+  Material material = new Demo02Material();
 
   void update(num time, num delta) {
     rotate(delta*O/2000, unitY);

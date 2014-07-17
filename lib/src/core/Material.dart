@@ -25,6 +25,7 @@ class Material {
 
   List<GlslAttribute> get attributes => _collectAttributes();
   List<GlslUniform> get uniforms => _collectUniforms();
+  List<GlslVarying> get varyings => _collectVaryings();
 
   String get name => this.runtimeType.toString();
 
@@ -133,6 +134,12 @@ class Material {
     return uniforms;
   }
 
+  List<GlslUniform> _collectVaryings() {
+    List<GlslVarying> varyings = [];
+    varyings.addAll(vertex.varyings);
+    return varyings;
+  }
+
   // this may be supported in the future, thus negating the need for this.
   void _checkLayersUnicity() {
     List<String> uniqueIds = [];
@@ -199,6 +206,15 @@ class Material {
       into.uniforms.add(mangledUniform);
       mangledContents = mangledContents.replaceAllMapped(
           new RegExp(r"(\b)("+uniform.name+r")(\b)"),
+          (Match m) => "${m[1]}${mangledName}${m[3]}");
+    }
+
+    for (GlslVarying varying in from.varyings) {
+      String mangledName = uid + '_' + varying.name;
+      GlslVarying mangledVarying = new GlslVarying(varying.type, mangledName);
+      into.varyings.add(mangledVarying);
+      mangledContents = mangledContents.replaceAllMapped(
+          new RegExp(r"(\b)("+varying.name+r")(\b)"),
           (Match m) => "${m[1]}${mangledName}${m[3]}");
     }
 

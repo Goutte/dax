@@ -22,11 +22,13 @@ part 'src/core/SceneNode.dart';
 part 'src/core/Shader.dart';
 part 'src/core/ShaderProgram.dart';
 part 'src/core/SpatialSceneNode.dart';
+part 'src/core/Texture.dart';
 part 'src/core/WebGLRenderer.dart';
 part 'src/core/World.dart';
 
 part 'src/layer/ColorLayer.dart';
 part 'src/layer/PositionLayer.dart';
+part 'src/layer/BitmapTextureLayer.dart';
 
 part 'src/material/DefaultMaterial.dart';
 

@@ -19,6 +19,7 @@ class Shader {
 
   List<GlslUniform> uniforms = [];
   List<GlslAttribute> attributes = [];
+  List<GlslVarying> varyings = [];
   GlslMain main;
 
   /// Other miscellaneous code.
@@ -49,6 +50,10 @@ class Shader {
       s += "uniform ${uniform.type} ${uniform.name};\n";
     }
 
+    for (GlslVarying varying in varyings) {
+      s += "varying ${varying.type} ${varying.name};\n";
+    }
+
     s += "\n${other}\n";
 
     if (main != null) {
@@ -63,12 +68,21 @@ class Shader {
   _parseGlsl(String glsl) {
 
     // `.` does not match carriage returns, even with multiLine, but \s does.
-    RegExp uniformRegex = new RegExp(
-        r"uniform\s+([a-zA-Z0-9_]+)\s+([a-zA-Z0-9_]+)\s*;", multiLine: true);
     RegExp attributeRegex = new RegExp(
         r"attribute\s+([a-zA-Z0-9_]+)\s+([a-zA-Z0-9_]+)\s*;", multiLine: true);
+    RegExp uniformRegex = new RegExp(
+        r"uniform\s+([a-zA-Z0-9_]+)\s+([a-zA-Z0-9_]+)\s*;", multiLine: true);
+    RegExp varyingRegex = new RegExp(
+        r"varying\s+([a-zA-Z0-9_]+)\s+([a-zA-Z0-9_]+)\s*;", multiLine: true);
     RegExp mainRegex = new RegExp(
         r"main\s*\([^)]*\)\s*\{((?:.|\s)*)\}", multiLine: true);
+
+    for (Match match in attributeRegex.allMatches(glsl)) {
+      String type = match.group(1);
+      String name = match.group(2);
+      GlslAttribute attribute = new GlslAttribute(type, name);
+      attributes.add(attribute);
+    }
 
     for (Match match in uniformRegex.allMatches(glsl)) {
       String type = match.group(1);
@@ -77,11 +91,11 @@ class Shader {
       uniforms.add(uniform);
     }
 
-    for (Match match in attributeRegex.allMatches(glsl)) {
+    for (Match match in varyingRegex.allMatches(glsl)) {
       String type = match.group(1);
       String name = match.group(2);
-      GlslAttribute attribute = new GlslAttribute(type, name);
-      attributes.add(attribute);
+      GlslVarying varying = new GlslVarying(type, name);
+      varyings.add(varying);
     }
 
     if (mainRegex.hasMatch(glsl)) {

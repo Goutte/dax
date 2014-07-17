@@ -15,10 +15,8 @@ Hopefully, these needs will grow with time, and so will the features of dax.
 RoadMap
 =======
 
-- Application
-- CubeMesh
-- QuadsphereMesh
-- Controller
+The initial objective of dax is to provide enough features
+to make a simple game like [Cyx](http://antoine.goutenoir.com/games/cyx/).
 
 
 Not implemented
@@ -30,10 +28,11 @@ Features you'd expect but have not been implemented.
 
 - Shader preprocessor `shared` variables
 - Camera's Octree
-- AmbientLight (extends SceneNode)
-- SpotLight (extends SpatialSceneNode)
-- Meshes
-- Shaders
+- Lights
+  - AmbientLight
+  - SpotLight (extends SpatialSceneNode)
+- more Meshes
+- more Shaders
 
 
 Dependencies
