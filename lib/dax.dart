@@ -7,6 +7,7 @@ import 'dart:typed_data';
 import 'package:color/color.dart';
 import 'package:vector_math/vector_math.dart';
 import 'package:stats/stats.dart';
+import 'package:game_loop/game_loop_html.dart';
 
 part 'src/core/Camera.dart';
 part 'src/core/Controller.dart';

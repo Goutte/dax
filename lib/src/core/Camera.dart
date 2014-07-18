@@ -66,7 +66,7 @@ class Camera extends SpatialSceneNode {
   /// PRIVVIES -----------------------------------------------------------------
 
   Matrix4 _getPerspectiveMatrix() {
-    if (_pMatrixStale) {
+    if (_pMatrixStale || true) {
       setPerspectiveMatrix(_pMatrix, fov, aspect, near, far);
       _pMatrixStale = false;
     }
@@ -74,7 +74,7 @@ class Camera extends SpatialSceneNode {
   }
 
   Matrix4 _getViewMatrix() {
-    if (_vMatrixStale) {
+    if (_vMatrixStale || true) {
       setViewMatrix(_vMatrix, _position, _focus, _up);
       _vMatrixStale = false;
     }

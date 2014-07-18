@@ -84,6 +84,8 @@ class ShaderProgram {
     return gl.vertexAttribPointer(location, attribute.size, WebGL.FLOAT, false, 0, 0);
   }
 
+  int _iTest = -1;
+
   void setUniform(WebGL.RenderingContext gl, GlslUniform variable, value) {
 
     var location = uniformsLocations[variable.name];
@@ -119,9 +121,11 @@ class ShaderProgram {
         if (value is BitmapTexture) {
           int target = value.target;
           WebGL.Texture handle;
-          if (textures.containsKey(value)) {
-            handle = textures[value];
-          } else {
+
+//          if (textures.containsKey(value)) {
+//            handle = textures[value];
+//          } else {
+
             handle = gl.createTexture();
 
             gl.bindTexture(target, handle);
@@ -132,12 +136,12 @@ class ShaderProgram {
             gl.texParameteri(target, WebGL.TEXTURE_MIN_FILTER, WebGL.NEAREST);
 
             try {
-              if (value.isLoaded) {
+              if (value.isLoaded || true) {
                 // Upload the texture bitmap data to the GPU.
                 gl.texImage2D(target, 0, WebGL.RGBA, WebGL.RGBA, WebGL.UNSIGNED_BYTE, value.image);
               } else {
                 //gl.texImage2D(target, 0, WebGL.RGBA, WebGL.RGBA, WebGL.UNSIGNED_BYTE, null);
-                print("Texture's image still not loaded.");
+//                print("Texture's image still not loaded.");
               }
             } catch (e) {
               print('Failed to upload the texture data to the GPU : ${e}');
@@ -148,7 +152,11 @@ class ShaderProgram {
 //            gl.pixelStorei GL_UNPACK_FLIP_Y_WEBGL, attrs.flip_y
 //            conversion = if attrs.colorspace_conversion then GL_BROWSER_DEFAULT_WEBGL else GL_NONE
 //            gl.pixelStorei GL_UNPACK_COLORSPACE_CONVERSION_WEBGL, conversion
-          }
+
+
+//          }
+
+          _iTest += 1;
 
           gl.bindTexture(target, handle);
           return gl.uniform1i(location, 0); // fixme textureIndex instead of 0

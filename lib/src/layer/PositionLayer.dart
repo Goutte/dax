@@ -33,6 +33,9 @@ void main(void) {
     return {
         'VERTEX_POSITION': model.mesh.vertices,
         'uMMatrix': model.matrix,
+        // todo: compute only if the camera moved
+        'uPMatrix': world.camera.perspectiveMatrix,
+        'uVMatrix': world.camera.viewMatrix,
     };
   }
 

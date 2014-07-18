@@ -48,9 +48,8 @@ class DemoSquareModel extends Model {
   Material material = new Demo02Material01();
 
   void update(num time, num delta) {
-    rotate(delta*O/3000, unitY);
-//    setPosition(new Vector3(0.0, sin(time/200), 5*sin(time/900)));
-    setPosition(new Vector3(sin(time/1200+O/2), 0.0, cos(time/1200+O/2)));
+    rotate(delta*O/13, unitY);
+    setPosition(new Vector3(sin(time/10+O/2), 0.0, cos(time/10+O/2)));
   }
 }
 
@@ -66,10 +65,10 @@ class DemoSquareModel02 extends Model {
   void update(num time, num delta) {
 //    rotate(delta*O/3000, unitY);
 //    setPosition(new Vector3(cos(time/900), sin(time/900), 0.0));
-    rotate(delta*O/4000, unitY);
-    rotate(delta*O/8000, unitZ);
-    rotate(delta*O/8000, unitX);
-    setPosition(new Vector3(sin(time/1200), 0.0, cos(time/1200)));
+    rotate(delta*O/24, unitY);
+    rotate(delta*O/42, unitZ);
+    rotate(delta*O/42, unitX);
+    setPosition(new Vector3(sin(time/10), 0.0, cos(time/10)));
   }
 }
 
@@ -107,8 +106,17 @@ main() {
   demo.gl.blendFunc(SRC_ALPHA, ONE_MINUS_SRC_ALPHA);
   demo.gl.enable(BLEND);
 
-  demo.startRendering();
-  demo.startUpdating();
+  demo.start();
+
+//  demo.startRendering();
+//  demo.startUpdating();
+
+//  demo.
+
+  //demo.onUpdate = update;
+//  demo.onRender = render;
+//  demo.onResize = resize;
+//  resize(demo);
 
 
 }

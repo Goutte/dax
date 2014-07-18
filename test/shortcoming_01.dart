@@ -102,9 +102,9 @@ main() {
 
   Controller demo = new Shortcoming01(canvas, stats);
 
-  demo.gl.enable(DEPTH_TEST);
-  demo.gl.blendFunc(SRC_ALPHA, ONE_MINUS_SRC_ALPHA);
-  demo.gl.enable(BLEND);
+  demo._gl.enable(DEPTH_TEST);
+  demo._gl.blendFunc(SRC_ALPHA, ONE_MINUS_SRC_ALPHA);
+  demo._gl.enable(BLEND);
 
   demo.startRendering();
   demo.startUpdating();

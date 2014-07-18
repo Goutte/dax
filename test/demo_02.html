@@ -25,69 +25,22 @@
     </style>
   </head>
   <body>
-    <h1>Dax "failing" Demo #02</h1>
+    <h1>Dax Demo #02</h1>
     <p>
-      You should see below a swirling Goutte and a crazy scientist failing to be transparent.
-      The should BOTH be transparent.
-      See README's Transparency.
-      When this will not fail anymore, upgrade to a transparency test on models with tricky collisions.
+      You should see below a quadsphere with trackball controls.
       <a id="showStatsButton" href="?fps">Show Stats.</a>
     </p>
     <canvas id="demoCanvas" width="500" height="500"></canvas>
     <p>
       This demo showcases usage of :
       <ul>
-        <li>BLEND(SRC_ALPHA,ONE_MINUS_SRC_ALPHA) & DEPTH_TEST</li>
+        <li>Trackball <code>Camera</code> controls</li>
         <li>Extending the <code>Controller</code></li>
         <li>Extending <code>Model.update()</code></li>
         <li>The material layer <code>BitmapTextureLayer</code></li>
       </ul>
       <pre>
         <code>
-/**
- * A simple material that loads the image `texture/goutte.png` as texture.
- */
-class Demo02Material extends Material {
-  Demo02Material() : super() {
-    layers.add(new PositionLayer());
-    layers.add(new ColorLayer());
-    layers.add(new BitmapTextureLayer(new ImageElement(src: "texture/goutte.png")));
-  }
-}
-
-/**
- * A simple square model, that spins around its Y axis.
- */
-class DemoSquareModel extends Model {
-  Mesh _mesh = new SquareMesh();
-  Mesh get mesh => _mesh;
-
-  Material material = new Demo02Material();
-
-  void update(num time, num delta) {
-    rotate(delta*O/2000, unitY);
-    setPosition(new Vector3(0.0, sin(time/200), 5*sin(time/900)));
-  }
-}
-
-/**
- * We define our Demo Controller that will set up the world's models.
- */
-class Demo02 extends Controller {
-  Demo02(CanvasElement canvas, Stats stats) : super(canvas, stats: stats) {
-    world.add(new DemoSquareModel());
-  }
-}
-
-// ...
-
-
-Controller demo = new Demo02(canvas, stats);
-
-demo.gl.enable(DEPTH_TEST);
-
-demo.startRendering();
-demo.startUpdating();
         </code>
       </pre>
     </p>
