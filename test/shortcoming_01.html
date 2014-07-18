@@ -85,6 +85,8 @@ class Demo02 extends Controller {
 Controller demo = new Demo02(canvas, stats);
 
 demo.gl.enable(DEPTH_TEST);
+demo.gl.blendFunc(SRC_ALPHA, ONE_MINUS_SRC_ALPHA);
+demo.gl.enable(BLEND);
 
 demo.startRendering();
 demo.startUpdating();

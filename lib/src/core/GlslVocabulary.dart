@@ -5,6 +5,7 @@ class GlslVariable {
   String name;
   String type;
 
+  /// The number of elements (floats, ints) of the [type] of this variable.
   int get size => _getSize();
 
   GlslVariable(this.type, this.name);

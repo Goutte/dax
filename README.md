@@ -19,6 +19,22 @@ The initial objective of dax is to provide enough features
 to make a simple game like [Cyx](http://antoine.goutenoir.com/games/cyx/).
 
 
+Transparency
+============
+
+http://www.opengl.org/archives/resources/faq/technical/transparency.htm
+
+We *need* the DEPTH_TEST. Alternatives: render back-to-front model-wise (banana problems)
+For simplicity, we're going to ignore transparency for now.
+
+When we'll want some :
+
+- Activate BLEND (keep DEPTH_TEST)
+- Render the opaques
+- Render the transps (back-to-front order, model-wise)
+- Octree !
+- Manage somehow special case : transps with boundingboxes collisions (banana!)
+
 Not implemented
 ===============
 

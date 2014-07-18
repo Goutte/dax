@@ -2,7 +2,9 @@ part of dax;
 
 
 /**
- *
+ * Supported:
+ * - Power of 2 sized [image]
+ * - Factory BitmapTextureLayer.src
  */
 class BitmapTextureLayer extends MaterialLayer {
 
@@ -29,7 +31,18 @@ void main(void) {
 
   ImageElement image;
 
-  BitmapTextureLayer(ImageElement this.image);
+  BitmapTextureLayer(ImageElement this.image) : super();
+
+  /**
+   * @NotSure. Also fromPng() fromFilepath()
+   * Example usage :
+   *   layers.add(new BitmapTextureLayer.src("texture/bricks.png");
+   */
+  factory BitmapTextureLayer.src(String src) {
+    ImageElement image = new ImageElement(src: src);
+    return new BitmapTextureLayer(image);
+  }
+
 
   Map<String, dynamic> onSetup(World world, Model model, Renderer renderer) {
     return {

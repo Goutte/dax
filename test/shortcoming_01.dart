@@ -49,14 +49,13 @@ class DemoSquareModel extends Model {
 
   void update(num time, num delta) {
     rotate(delta*O/3000, unitY);
-//    setPosition(new Vector3(0.0, sin(time/200), 5*sin(time/900)));
     setPosition(new Vector3(sin(time/1200+O/2), 0.0, cos(time/1200+O/2)));
   }
 }
 
 /**
-* A simple square model, spinning. (?)
-*/
+ * A simple square model, spinning. (?)
+ */
 class DemoSquareModel02 extends Model {
   Mesh _mesh = new SquareMesh();
   Mesh get mesh => _mesh;
@@ -76,10 +75,10 @@ class DemoSquareModel02 extends Model {
 /**
  * We define our Demo Controller that will set up the world's models.
  */
-class Demo02 extends Controller {
+class Shortcoming01 extends Controller {
   Model square;
 
-  Demo02(CanvasElement canvas, Stats stats) : super(canvas, stats: stats) {
+  Shortcoming01(CanvasElement canvas, Stats stats) : super(canvas, stats: stats) {
     square = new DemoSquareModel();
     world.add(square);
     world.add(new DemoSquareModel02());
@@ -101,7 +100,7 @@ main() {
     document.body.children.add(stats.container);
   }
 
-  Controller demo = new Demo02(canvas, stats);
+  Controller demo = new Shortcoming01(canvas, stats);
 
   demo.gl.enable(DEPTH_TEST);
   demo.gl.blendFunc(SRC_ALPHA, ONE_MINUS_SRC_ALPHA);
