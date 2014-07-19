@@ -65,38 +65,50 @@ abstract class Controller extends GameLoopHtml {
 
 
   Vector3 _mouse_moved_camera_position = new Vector3(0.0,0.0,0.0);
+  /// DEFAULTS : there should not be defaults here, but in mixins !
+  /// this is only a draft
   mouse_moved(Mouse mouse) {
 
-    /// DEFAULTS : there should not be defaults here, but in mixins !
-    /// this is only a draft
-    _mouse_moved_camera_position = world.camera.position;
+//    _mouse_moved_camera_position = world.camera.position;
 
     num strenght = 100;
-    _mouse_moved_camera_position.z = mouse.y.toDouble() / strenght;
-    _mouse_moved_camera_position.x = mouse.x.toDouble() / strenght;
+//    _mouse_moved_camera_position.z = mouse.y.toDouble() / strenght;
+//    _mouse_moved_camera_position.x = mouse.x.toDouble() / strenght;
 
 //    print("New camera position: $_mouse_moved_camera_position");
 
-    world.camera.setPosition(_mouse_moved_camera_position);
+//    world.camera.setPosition(_mouse_moved_camera_position);
 
   }
 
 
   Vector3 _mouse_wheeled_camera_position = new Vector3(0.0,0.0,0.0);
+  /// DEFAULTS : there should not be defaults here, but in mixins !
+  /// this is only a draft
   mouse_wheeled(Mouse mouse) {
+    num minDistance = 2.0;
+    num maxDistance = 42.0;
 
-    /// DEFAULTS : there should not be defaults here, but in mixins !
-    /// this is only a draft
     _mouse_wheeled_camera_position.setFrom(world.camera.position);
 
-    num strenght = -1/100;
+    num strenght = 1/100;
     _mouse_wheeled_camera_position.add(world.camera.direction * mouse.wheelDy * strenght);
-//    _mouse_wheeled_camera_position.x = mouse.x.toDouble() / strenght;
-
-//    print("New camera position: $_mouse_moved_camera_position");
-
+    _mouse_wheeled_camera_position = constrainSatellite(_mouse_wheeled_camera_position, world.camera.focus, minDistance, maxDistance);
     world.camera.setPosition(_mouse_wheeled_camera_position);
+  }
 
+  /**
+   *
+   */
+  Vector3 constrainSatellite(Vector3 satellite, Vector3 origin, num min, num max) {
+    // fixme
+    Vector3 diff = satellite - origin;
+    if (diff.length2 < min * min) {
+      diff.normalize().scale(min);
+    } else if (diff.length2 > max * max) {
+      diff.normalize().scale(max);
+    }
+    return origin + diff;
   }
 
 //  void _requestAnimationFrame(num _) {
