@@ -29,6 +29,8 @@ class SpatialSceneNode extends SceneNode {
 
   Matrix4 _matrix = new Matrix4.identity();
   Matrix4 _inverseMatrix = new Matrix4.identity();
+  Matrix3 _normalMatrix = new Matrix3.identity();
+  Matrix3 _inverseNormalMatrix = new Matrix3.identity();
 
   /// Unitary vectors for convenience -- PROTECTED attributes, not really public
   Vector3 unitX = new Vector3(1.0, 0.0, 0.0);
@@ -66,6 +68,9 @@ class SpatialSceneNode extends SceneNode {
   Matrix4 get matrix => _getMatrix();
   /// The matrix of referential change from world to local space.
   Matrix4 get inverseMatrix => _getInverseMatrix();
+
+  Matrix3 get normalMatrix => _getNormalMatrix();
+  Matrix3 get inverseNormalMatrix => _getInverseNormalMatrix();
 
 
   /// CONSTRUCTORS -------------------------------------------------------------
@@ -149,7 +154,7 @@ class SpatialSceneNode extends SceneNode {
    *   node.toWorld3(out, new Vector3(0.0, 1.0, 0.0))
    *   => returns a Vector3 equal to node.up
    */
-  Vector3 toWorld3(Vector3 out, Vector3 localVector3) {
+  Vector3 positionInWorld3(Vector3 out, Vector3 localVector3) {
     return matrix.transformed3(localVector3, out);
   }
 
@@ -161,8 +166,16 @@ class SpatialSceneNode extends SceneNode {
    *   node.toLocal3(out, node.up)
    *   => returns a Vector3 equal to (0.0, 1.0, 0.0)
    */
-  Vector3 toLocal3(Vector3 out, Vector3 worldVector3) {
+  Vector3 positionInLocal3(Vector3 out, Vector3 worldVector3) {
     return inverseMatrix.transformed3(worldVector3, out);
+  }
+
+  Vector3 directionInWorld3(Vector3 out, Vector3 localVector3) {
+    return normalMatrix.transformed(localVector3, out);
+  }
+
+  Vector3 directionInLocal3(Vector3 out, Vector3 worldVector3) {
+    return inverseNormalMatrix.transformed(worldVector3, out);
   }
 
 
@@ -179,51 +192,112 @@ class SpatialSceneNode extends SceneNode {
 
   Vector3 _getPosition() {
     if (!_doNotRecalculate(FLAG_POSITION)) {
-      toWorld3(_position, _origin);
+      positionInWorld3(_position, _origin);
     }
     return _position;
   }
 
   Vector3 _getUp() {
     if (!_doNotRecalculate(FLAG_UP)) {
-      toWorld3(_up, unitY);
+      directionInWorld3(_up, unitY);
     }
     return _up;
   }
 
   Vector3 _getRight() {
     if (!_doNotRecalculate(FLAG_RIGHT)) {
-      toWorld3(_right, unitX);
+      directionInWorld3(_right, unitX);
     }
     return _right;
   }
 
   Vector3 _getDirection() {
     if (!_doNotRecalculate(FLAG_DIRECTION)) {
-      print('recalc direction $_direction');
-      toWorld3(_direction, unitZ * -1);
-      print('recalc direction $_direction');
+//      print('recalc direction $_direction');
+      directionInWorld3(_direction, unitZ * -1);
+//      print('recalc direction $_direction');
     }
     return _direction;
   }
 
   Matrix4 _getMatrix() {
     if (!_doNotRecalculate(FLAG_MATRIX)) {
-      print('recalc matrix $_matrix');
+//      print('recalc matrix $_matrix');
       _matrix.copyInverse(inverseMatrix);
-      print('recalc matrix $_matrix');
+//      print('recalc matrix $_matrix');
     }
     return _matrix;
   }
 
   Matrix4 _getInverseMatrix() {
-//    print("Stale : $_stale / $FLAG_INVERSE_MATRIX ${_stale & FLAG_INVERSE_MATRIX > 0}");
     if (!_doNotRecalculate(FLAG_INVERSE_MATRIX)) {
 //      print('recalc inv matrix $_inverseMatrix');
       _inverseMatrix.copyInverse(matrix);
 //      print('recalc inv matrix $_inverseMatrix');
     }
     return _inverseMatrix;
+  }
+
+  Matrix3 _getNormalMatrix() {
+    if (!_doNotRecalculate(FLAG_NORMAL_MATRIX)) {
+      _normalMatrix = _getNormalMatrixFromModelMatrix(matrix);
+    }
+    return _normalMatrix;
+  }
+
+  Matrix3 _getInverseNormalMatrix() {
+    if (!_doNotRecalculate(FLAG_INVERSE_NORMAL_MATRIX)) {
+      _inverseNormalMatrix= _getNormalMatrixFromModelMatrix(inverseMatrix);
+    }
+    return _inverseNormalMatrix;
+  }
+
+  /**
+   * Ideally, move this to vector_math
+   * Can also be de-vectorized to be faster, like
+   * https://github.com/toji/gl-matrix/tree/master/src/gl-matrix/mat3.js
+   * normal = transpose(inverse(model))
+   */
+  Matrix3 _getNormalMatrixFromModelMatrix(Matrix4 modelMatrix) {
+    Matrix3 out = new Matrix3.identity();
+    var a = modelMatrix;
+    var a00 = a[0], a01 = a[1], a02 = a[2], a03 = a[3],
+        a10 = a[4], a11 = a[5], a12 = a[6], a13 = a[7],
+        a20 = a[8], a21 = a[9], a22 = a[10], a23 = a[11],
+        a30 = a[12], a31 = a[13], a32 = a[14], a33 = a[15],
+
+        b00 = a00 * a11 - a01 * a10,
+        b01 = a00 * a12 - a02 * a10,
+        b02 = a00 * a13 - a03 * a10,
+        b03 = a01 * a12 - a02 * a11,
+        b04 = a01 * a13 - a03 * a11,
+        b05 = a02 * a13 - a03 * a12,
+        b06 = a20 * a31 - a21 * a30,
+        b07 = a20 * a32 - a22 * a30,
+        b08 = a20 * a33 - a23 * a30,
+        b09 = a21 * a32 - a22 * a31,
+        b10 = a21 * a33 - a23 * a31,
+        b11 = a22 * a33 - a23 * a32,
+
+        // Calculate the determinant
+        det = b00 * b11 - b01 * b10 + b02 * b09 + b03 * b08 - b04 * b07 + b05 * b06;
+
+    if (!det) { return out; }
+    det = 1.0 / det;
+
+    out[0] = (a11 * b11 - a12 * b10 + a13 * b09) * det;
+    out[1] = (a12 * b08 - a10 * b11 - a13 * b07) * det;
+    out[2] = (a10 * b10 - a11 * b08 + a13 * b06) * det;
+
+    out[3] = (a02 * b10 - a01 * b11 - a03 * b09) * det;
+    out[4] = (a00 * b11 - a02 * b08 + a03 * b07) * det;
+    out[5] = (a01 * b08 - a00 * b10 - a03 * b06) * det;
+
+    out[6] = (a31 * b05 - a32 * b04 + a33 * b03) * det;
+    out[7] = (a32 * b02 - a30 * b05 - a33 * b01) * det;
+    out[8] = (a30 * b04 - a31 * b02 + a33 * b00) * det;
+
+    return out;
   }
 
 }

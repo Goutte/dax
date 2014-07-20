@@ -108,7 +108,7 @@ abstract class Controller extends GameLoopHtml {
 
 //    _mouse_moved_camera_position = world.camera.position;
 
-    num strenght = 1/75;
+    num strenght = 1/2500;
 
     Camera camera = world.camera;
     num dx = mouse.dx * strenght * -1;
