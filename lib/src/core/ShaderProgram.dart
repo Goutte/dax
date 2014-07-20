@@ -156,10 +156,8 @@ class ShaderProgram {
 
 //          }
 
-          _iTest += 1;
-
           gl.bindTexture(target, handle);
-          return gl.uniform1i(location, 0); // fixme textureIndex instead of 0
+          return gl.uniform1i(location, 0); // fixme : textureIndex instead of 0 ?
         } else {
           throw new ArgumentError("sampler2D must be an instance of BitmapTexture");
         }

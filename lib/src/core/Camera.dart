@@ -17,7 +17,7 @@ part of dax;
  */
 class Camera extends SpatialSceneNode {
 
-  Vector3 _focus;
+//  Vector3 _focus;
 
   /// Memoization holders
 
@@ -38,7 +38,7 @@ class Camera extends SpatialSceneNode {
   /// GETTERS ------------------------------------------------------------------
 
   /// The spatial and cartesian (x,y,z) position of the [focus] of the camera.
-  Vector3 get focus => _focus;
+//  Vector3 get focus => _focus;
 
   num get aspect => width / height;
 
@@ -48,15 +48,24 @@ class Camera extends SpatialSceneNode {
   /// CONSTRUCTORS -------------------------------------------------------------
 
   Camera({ Vector3 position, Vector3 focus, Vector3 up }) : super() {
-    if (position == null) position = new Vector3(0.0, 0.0, -10.0);
+    if (position == null) position = new Vector3(0.0, 0.0, 10.0);
     if (focus == null) focus = new Vector3(0.0, 0.0, 0.0);
     if (up == null) up = new Vector3(0.0, 1.0, 0.0);
-    this._position = position;
-    this._focus = focus;
-    this._up = up;
+//    this._position = position;
+//    this._focus = focus;
+//    this._up = up;
+
+    // fixme:
+    lookAt(position, focus, up);
+
+//    print("looked at");
+//    assert(this.position.z == -10.0);
+    print("looked in ${this.direction} !");
+
+//    this._stale |= FL
 
     _pMatrix = makePerspectiveMatrix(fov, aspect, near, far);
-    _vMatrix = makeViewMatrix(_position, _focus, _up);
+    _vMatrix = makeViewMatrix(position, focus, up);
   }
 
   /// OVERRIDES ----------------------------------------------------------------
@@ -75,7 +84,7 @@ class Camera extends SpatialSceneNode {
 
   Matrix4 _getViewMatrix() {
     if (_vMatrixStale || true) {
-      setViewMatrix(_vMatrix, _position, _focus, _up);
+      setViewMatrix(_vMatrix, position, position + direction, up);
       _vMatrixStale = false;
     }
     return _vMatrix;

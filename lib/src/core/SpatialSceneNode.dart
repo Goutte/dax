@@ -22,9 +22,10 @@ The following **read-only** attributes should also be available:
 class SpatialSceneNode extends SceneNode {
 
   Vector3 _position  = new Vector3(0.0, 0.0, 0.0);
-  Vector3 _right     = new Vector3(0.0, 1.0, 0.0);
+  Vector3 _right     = new Vector3(1.0, 0.0, 0.0);
   Vector3 _up        = new Vector3(0.0, 1.0, 0.0);
   Vector3 _direction = new Vector3(0.0, 0.0, -1.0);
+  Quaternion _rotation  = new Quaternion.identity();
 
   Matrix4 _matrix = new Matrix4.identity();
   Matrix4 _inverseMatrix = new Matrix4.identity();
@@ -85,6 +86,47 @@ class SpatialSceneNode extends SceneNode {
     _stale |= SET_POSITION_FLAGS;
   }
 
+  static const int SET_ROTATION_FLAGS =
+      FLAG_INVERSE_MATRIX | FLAG_UP | FLAG_RIGHT | FLAG_DIRECTION |
+      FLAG_NORMAL_MATRIX | FLAG_INVERSE_NORMAL_MATRIX;
+  /**
+   * Sets the rotation of this node to [newRotation], in world space.
+   */
+  void setRotation(Quaternion newRotation) {
+    _rotation.copyFrom(newRotation);
+    _matrix.setFromTranslationRotation(position, _rotation);
+//    _stale ^= FLAG_MATRIX | FLAG_ROTATION;
+    _stale |= SET_ROTATION_FLAGS;
+  }
+
+
+  static const int LOOK_AT_FLAGS =
+      FLAG_MATRIX | FLAG_UP | FLAG_RIGHT | FLAG_DIRECTION | FLAG_ROTATION |
+      FLAG_NORMAL_MATRIX | FLAG_INVERSE_NORMAL_MATRIX;
+  /**
+   * Analogous to the classic `gluLookAt`.
+   * Repositions the camera at the world-space [eye] position,
+   * orients the camera so that its local positive Y axis is
+   * in the world-space direction of [up], and points the camera
+   * towards the world-space position of [point].
+   */
+  void lookAt(Vector3 eye, Vector3 point, Vector3 up) {
+    setViewMatrix(_inverseMatrix, eye, point, up);
+    _position.setFrom(eye);
+//    _stale ^= FLAG_INVERSE_MATRIX | FLAG_POSITION;
+//    _stale ^= FLAG_POSITION;
+    _stale |= FLAG_POSITION;
+    _stale |= LOOK_AT_FLAGS;
+    _doNotRecalculate(FLAG_INVERSE_MATRIX);
+    _doNotRecalculate(FLAG_POSITION);
+//    _stale ^= FLAG_INVERSE_MATRIX;
+    // invalidate frustum, too
+  }
+
+
+
+  /// LOCAL SPACE //////////////////////////////////////////////////////////////
+
   static const int ROTATE_FLAGS =
       FLAG_UP | FLAG_RIGHT | FLAG_DIRECTION | FLAG_ROTATION |
       FLAG_INVERSE_MATRIX | FLAG_NORMAL_MATRIX | FLAG_INVERSE_NORMAL_MATRIX;
@@ -96,6 +138,8 @@ class SpatialSceneNode extends SceneNode {
     _matrix = matrix.rotate(alongAxis, amountInRadians);
     _stale |= ROTATE_FLAGS;
   }
+
+  /// REFERENTIAL CHANGE UTILS /////////////////////////////////////////////////
 
   /**
    * Transforms the given [localVector3] in local space to the same Vector3 in
@@ -124,53 +168,60 @@ class SpatialSceneNode extends SceneNode {
 
   /// PRIVVIES -----------------------------------------------------------------
 
-  bool _shouldRecalculate(int attribute_flag) {
+  bool _doNotRecalculate(int attribute_flag) {
     if (_stale & attribute_flag > 0) {
       _stale ^= attribute_flag;
-      return true;
-    } else {
       return false;
+    } else {
+      return true;
     }
   }
 
   Vector3 _getPosition() {
-    if (_shouldRecalculate(FLAG_POSITION)) {
+    if (!_doNotRecalculate(FLAG_POSITION)) {
       toWorld3(_position, _origin);
     }
     return _position;
   }
 
   Vector3 _getUp() {
-    if (_shouldRecalculate(FLAG_UP)) {
+    if (!_doNotRecalculate(FLAG_UP)) {
       toWorld3(_up, unitY);
     }
     return _up;
   }
 
   Vector3 _getRight() {
-    if (_shouldRecalculate(FLAG_RIGHT)) {
+    if (!_doNotRecalculate(FLAG_RIGHT)) {
       toWorld3(_right, unitX);
     }
     return _right;
   }
 
   Vector3 _getDirection() {
-    if (_shouldRecalculate(FLAG_DIRECTION)) {
+    if (!_doNotRecalculate(FLAG_DIRECTION)) {
+      print('recalc direction $_direction');
       toWorld3(_direction, unitZ * -1);
+      print('recalc direction $_direction');
     }
     return _direction;
   }
 
   Matrix4 _getMatrix() {
-    if (_shouldRecalculate(FLAG_MATRIX)) {
+    if (!_doNotRecalculate(FLAG_MATRIX)) {
+      print('recalc matrix $_matrix');
       _matrix.copyInverse(inverseMatrix);
+      print('recalc matrix $_matrix');
     }
     return _matrix;
   }
 
   Matrix4 _getInverseMatrix() {
-    if (_shouldRecalculate(FLAG_INVERSE_MATRIX)) {
+//    print("Stale : $_stale / $FLAG_INVERSE_MATRIX ${_stale & FLAG_INVERSE_MATRIX > 0}");
+    if (!_doNotRecalculate(FLAG_INVERSE_MATRIX)) {
+//      print('recalc inv matrix $_inverseMatrix');
       _inverseMatrix.copyInverse(matrix);
+//      print('recalc inv matrix $_inverseMatrix');
     }
     return _inverseMatrix;
   }
