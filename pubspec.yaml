@@ -4,7 +4,9 @@ description: Experimental framework for developing WebGL-enabled applications.
 environment:
   sdk: '>=0.8.10+6 <2.0.0'
 dependencies:
-  vector_math: '>=1.4.2+1 <2.0.0'
+#  vector_math: '>=1.4.2+1 <2.0.0'
+  vector_math:
+      git: https://github.com/Goutte/vector_math
   color: '>=0.3.1 <1.0.0'
   stats: '>=0.1.2 <1.0.0'
   game_loop:

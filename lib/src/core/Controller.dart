@@ -108,7 +108,7 @@ abstract class Controller extends GameLoopHtml {
 
 //    _mouse_moved_camera_position = world.camera.position;
 
-    num strenght = 1/2500;
+    num strenght = 1/200;
 
     Camera camera = world.camera;
     num dx = mouse.dx * strenght * -1;
@@ -119,15 +119,20 @@ abstract class Controller extends GameLoopHtml {
     Quaternion _cameraQuatUp = new Quaternion.identity();
     Quaternion _cameraQuatRi = new Quaternion.identity();
     Quaternion _cameraQuat   = new Quaternion.identity();
+    Vector3 _cameraDirection = new Vector3.zero();
 
     _cameraQuatUp.setAxisAngle(camera.up,    -1 * dx);
     _cameraQuatRi.setAxisAngle(camera.right, -1 * dy);
     _cameraQuat = _cameraQuatUp * _cameraQuatRi; // /!\ makes new quat
 
 
-//    Vector3 oldDirection = camera.direction.clone();
-//    camera.setDirection
+    Vector3 oldDirection = camera.direction.clone();
+    _cameraDirection = _cameraQuat.rotated(oldDirection);
+    camera.setDirection(_cameraDirection);
+
     camera.setPosition(_cameraQuat.rotated(camera.position));
+
+
 
 
 
@@ -214,7 +219,7 @@ abstract class Controller extends GameLoopHtml {
     num dx = mouse.dx;
     num dy = mouse.dy;
 
-    if (dx != 0 && dy != 0) {
+    if (dx != 0 || dy != 0) {
       if (mouse.isDown(0)) {
         mouse_dragged(mouse);
       }

@@ -72,6 +72,8 @@ class SpatialSceneNode extends SceneNode {
   Matrix3 get normalMatrix => _getNormalMatrix();
   Matrix3 get inverseNormalMatrix => _getInverseNormalMatrix();
 
+  Quaternion get rotation => _getRotation();
+
 
   /// CONSTRUCTORS -------------------------------------------------------------
 
@@ -103,6 +105,40 @@ class SpatialSceneNode extends SceneNode {
 //    _stale ^= FLAG_MATRIX | FLAG_ROTATION;
     _stale |= SET_ROTATION_FLAGS;
   }
+
+  /**
+   * Sets the [direction] of this node to [newDirection], in world space.
+   */
+  void setDirection(Vector3 newDirection) {
+    Vector3 _norm = new Vector3.copy(newDirection);
+    Vector3 view = direction;
+    num magSq = newDirection.dot(newDirection);
+    if (magSq - 1 > 0.000001) {
+      // not a unit vector, normalize it
+      _norm.normalize();
+    } else if (magSq == 0) {
+      _norm[0] =  0;
+      _norm[1] =  0;
+      _norm[2] = -1;
+    }
+
+    // fixme : if up is provided
+
+    // if not up
+//    rotation = quat.rotationTo _quat, @get('direction'), _norm
+//    @rotateQuat rotation
+//    @set 'direction', vec3.copy view, _norm
+//    @stale ^= FLAGS.direction
+
+    Quaternion rotation = new Quaternion.identity();
+    _setQuaternionBetween(rotation, direction, _norm);
+    rotateQuat(rotation);
+
+    _direction.setFrom(_norm);
+    _doNotRecalculate(FLAG_DIRECTION);
+
+  }
+
 
 
   static const int LOOK_AT_FLAGS =
@@ -144,6 +180,21 @@ class SpatialSceneNode extends SceneNode {
     _stale |= ROTATE_FLAGS;
   }
 
+
+  static const int ROTATE_QUAT_FLAGS =
+      FLAG_UP | FLAG_RIGHT | FLAG_DIRECTION |
+      FLAG_ROTATION |
+      FLAG_INVERSE_MATRIX | FLAG_NORMAL_MATRIX | FLAG_INVERSE_NORMAL_MATRIX;
+  void rotateQuat(Quaternion q) {
+    Vector3 _origin = new Vector3.zero();
+    Matrix4 _rotMat = new Matrix4.identity();
+    _rotMat.setFromTranslationRotation(_origin, q);
+    _matrix = matrix.multiply(_rotMat);
+//    _rotation = rotation. ???
+//    @set 'rotation', quat.multiply rotation, newRotation, rotation
+    _stale |= ROTATE_QUAT_FLAGS;
+  }
+
   /// REFERENTIAL CHANGE UTILS /////////////////////////////////////////////////
 
   /**
@@ -170,10 +221,16 @@ class SpatialSceneNode extends SceneNode {
     return inverseMatrix.transformed3(worldVector3, out);
   }
 
+  /**
+   * fixme
+   */
   Vector3 directionInWorld3(Vector3 out, Vector3 localVector3) {
     return normalMatrix.transformed(localVector3, out);
   }
 
+  /**
+   * fixme
+   */
   Vector3 directionInLocal3(Vector3 out, Vector3 worldVector3) {
     return inverseNormalMatrix.transformed(worldVector3, out);
   }
@@ -213,27 +270,28 @@ class SpatialSceneNode extends SceneNode {
 
   Vector3 _getDirection() {
     if (!_doNotRecalculate(FLAG_DIRECTION)) {
-//      print('recalc direction $_direction');
       directionInWorld3(_direction, unitZ * -1);
-//      print('recalc direction $_direction');
     }
     return _direction;
   }
 
+  Quaternion _getRotation() {
+    if (!_doNotRecalculate(FLAG_ROTATION)) {
+      _setAxes(_rotation, direction, right, up);
+    }
+    return _rotation;
+  }
+
   Matrix4 _getMatrix() {
     if (!_doNotRecalculate(FLAG_MATRIX)) {
-//      print('recalc matrix $_matrix');
       _matrix.copyInverse(inverseMatrix);
-//      print('recalc matrix $_matrix');
     }
     return _matrix;
   }
 
   Matrix4 _getInverseMatrix() {
     if (!_doNotRecalculate(FLAG_INVERSE_MATRIX)) {
-//      print('recalc inv matrix $_inverseMatrix');
       _inverseMatrix.copyInverse(matrix);
-//      print('recalc inv matrix $_inverseMatrix');
     }
     return _inverseMatrix;
   }
@@ -252,10 +310,99 @@ class SpatialSceneNode extends SceneNode {
     return _inverseNormalMatrix;
   }
 
+  /// VECTOR MATH //////////////////////////////////////////////////////////////
+
   /**
-   * Ideally, move this to vector_math
-   * Can also be de-vectorized to be faster, like
-   * https://github.com/toji/gl-matrix/tree/master/src/gl-matrix/mat3.js
+   * Sets the specified quaternion with values corresponding to the given
+   * axes. Each axis is a Vector3 and is expected to be unit length and
+   * perpendicular to all the other specified axes.
+   *
+   * @param {Vector3} view  the vector representing the viewing direction
+   * @param {Vector3} right the vector representing the local "right" direction
+   * @param {Vector3} up    the vector representing the local "up" direction
+   */
+  Quaternion _setAxes(Quaternion out, Vector3 view, Vector3 right, Vector3 up) {
+    Matrix3 matr = new Matrix3.zero();
+
+    matr[0] = right[0];
+    matr[3] = right[1];
+    matr[6] = right[2];
+
+    matr[1] = up[0];
+    matr[4] = up[1];
+    matr[7] = up[2];
+
+    matr[2] = -view[0];
+    matr[5] = -view[1];
+    matr[8] = -view[2];
+
+    out.setRotation(matr);
+    return out.normalize();
+  }
+
+
+  /**
+   * Sets the [out] Quaternion to represent the shortest rotation from one
+   * Vector3 to another, to [here] and [there] if you will.
+   *
+   * Both vectors are assumed to be unit length.
+   */
+  Quaternion _setQuaternionBetween(Quaternion out, Vector3 here, Vector3 there) {
+    Vector3 _tmpV3 = new Vector3.zero();
+    Vector3 _unitX = new Vector3(1.0, 0.0, 0.0);
+    Vector3 _unitY = new Vector3(0.0, 1.0, 0.0);
+
+    num dot = here.dot(there);
+    if (dot < -0.999999) {
+      _unitX.crossInto(here, _tmpV3);
+      if (_tmpV3.length < 0.000001) {
+        _unitY.crossInto(here, _tmpV3);
+      }
+      _tmpV3.normalize();
+      out.setAxisAngle(_tmpV3, O/2);
+    } else if (dot > 0.999999) {
+      out[0] = 0.0;
+      out[1] = 0.0;
+      out[2] = 0.0;
+      out[3] = 1.0;
+    } else {
+      here.crossInto(there, _tmpV3);
+      out[0] = _tmpV3[0];
+      out[1] = _tmpV3[1];
+      out[2] = _tmpV3[2];
+      out[3] = 1 + dot;
+      out.normalize();
+    }
+
+    return out;
+  }
+
+
+//  var dot = vec3.dot(a, b);
+//  if (dot < -0.999999) {
+//      vec3.cross(tmpvec3, xUnitVec3, a);
+//      if (vec3.length(tmpvec3) < 0.000001)
+//          vec3.cross(tmpvec3, yUnitVec3, a);
+//      vec3.normalize(tmpvec3, tmpvec3);
+//      quat.setAxisAngle(out, tmpvec3, Math.PI);
+//      return out;
+//  } else if (dot > 0.999999) {
+//      out[0] = 0;
+//      out[1] = 0;
+//      out[2] = 0;
+//      out[3] = 1;
+//      return out;
+//  } else {
+//      vec3.cross(tmpvec3, a, b);
+//      out[0] = tmpvec3[0];
+//      out[1] = tmpvec3[1];
+//      out[2] = tmpvec3[2];
+//      out[3] = 1 + dot;
+//      return quat.normalize(out, out);
+//  }
+
+
+  /**
    * normal = transpose(inverse(model))
    */
   Matrix3 _getNormalMatrixFromModelMatrix(Matrix4 modelMatrix) {
