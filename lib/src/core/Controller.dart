@@ -87,14 +87,12 @@ abstract class Controller extends GameLoopHtml {
   /// DEFAULTS : there should not be defaults here, but in mixins !
   /// this is only a draft
   mouse_wheeled(Mouse mouse) {
-    num minDistance = 3.0;
+    num minDistance = 0.0;
     num maxDistance = 42.0;
-
-    print("position ${world.camera.position}");
 
     _mouse_wheeled_camera_position.setFrom(world.camera.position);
 
-    num strenght = 1/400;
+    num strenght = -1/400;
     _mouse_wheeled_camera_position.add(world.camera.direction * mouse.wheelDy * strenght);
     _mouse_wheeled_camera_position = constrainInCoconut(_mouse_wheeled_camera_position, new Vector3.zero(), minDistance, maxDistance);
     world.camera.setPosition(_mouse_wheeled_camera_position);
@@ -106,74 +104,30 @@ abstract class Controller extends GameLoopHtml {
   /// this is only a draft
   mouse_dragged(Mouse mouse) {
 
-//    _mouse_moved_camera_position = world.camera.position;
-
     num strenght = 1/200;
 
     Camera camera = world.camera;
     num dx = mouse.dx * strenght * -1;
     num dy = mouse.dy * strenght *  1;
 
-//    print('dragged! $dx $dy');
-
+    // todo: optimize
     Quaternion _cameraQuatUp = new Quaternion.identity();
     Quaternion _cameraQuatRi = new Quaternion.identity();
     Quaternion _cameraQuat   = new Quaternion.identity();
     Vector3 _cameraDirection = new Vector3.zero();
 
     _cameraQuatUp.setAxisAngle(camera.up,    -1 * dx);
-    _cameraQuatRi.setAxisAngle(camera.right, -1 * dy);
-    _cameraQuat = _cameraQuatUp * _cameraQuatRi; // /!\ makes new quat
+    _cameraQuatRi.setAxisAngle(camera.right,  1 * dy);
+    _cameraQuat = _cameraQuatUp.multiplyInto(_cameraQuatRi, _cameraQuat);
 
 
     Vector3 oldDirection = camera.direction.clone();
     _cameraDirection = _cameraQuat.rotated(oldDirection);
-    camera.setDirection(_cameraDirection);
+    camera.setDirection(_cameraDirection, camera.up);
 
     camera.setPosition(_cameraQuat.rotated(camera.position));
 
-
-
-
-
-//    camera.setPosition vec3.transformQuat(_vecPosition, camera.get('position'), _cameraQuat)
-
-//    print("New camera position: $_mouse_moved_camera_position");
-
-//    world.camera.setPosition(_mouse_moved_camera_position);
-
   }
-
-
-
-//  ###
-//  Rotate with free yaw axis when mouse is in the inscribed circle of the canvas
-//  Roll when out
-//
-//  You need, beforehand :
-//      @context.activeCamera.setFixedYawAxis(false)
-//
-//  Numbers are in pixels (but this method kind of does not care)
-//  X and Y along centered orthogonal referential, right and up positive
-//  See `mouse_dragged` method for a conversion from event's x and y.
-//
-//  camera : the camera to rotate
-//  x : the X position of the 2D cursor
-//  y : the Y position of the 2D cursor
-//  dx : difference from X of drag start
-//  dy : difference from Y of drag start
-//  w : width of the canvas
-//  h : height of the canvas
-//  ###
-//  quat.setAxisAngle _cameraQuatUp, camera.get('up'),    -1 * dx
-//  quat.setAxisAngle _cameraQuatRi, camera.get('right'), -1 * dy
-//  quat.multiply _cameraQuat, _cameraQuatUp, _cameraQuatRi
-//
-//  oldDirection = vec3.clone camera.get('direction')
-//  camera.setDirection vec3.transformQuat(_vecDirection, oldDirection, _cameraQuat), camera.get('up')
-
-
-
 
 
 
@@ -233,10 +187,6 @@ abstract class Controller extends GameLoopHtml {
       mouse_wheeled(mouse);
     }
   }
-
-//  void update(num time, num dt) {
-//    world.update(time, dt);
-//  }
 
   void update(num time, num delta){}
 

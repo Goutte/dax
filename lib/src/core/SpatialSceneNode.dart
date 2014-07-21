@@ -85,7 +85,7 @@ class SpatialSceneNode extends SceneNode {
       FLAG_POSITION | FLAG_INVERSE_MATRIX |
       FLAG_NORMAL_MATRIX | FLAG_INVERSE_NORMAL_MATRIX;
   /**
-   * Sets the position of this node to [newPosition], in world space.
+   * Sets the [position] of this node to [newPosition], in world space.
    */
   void setPosition(Vector3 newPosition) {
     _matrix = matrix;
@@ -97,7 +97,7 @@ class SpatialSceneNode extends SceneNode {
       FLAG_INVERSE_MATRIX | FLAG_UP | FLAG_RIGHT | FLAG_DIRECTION |
       FLAG_NORMAL_MATRIX | FLAG_INVERSE_NORMAL_MATRIX;
   /**
-   * Sets the rotation of this node to [newRotation], in world space.
+   * Sets the [rotation] of this node to [newRotation], in world space.
    */
   void setRotation(Quaternion newRotation) {
     _rotation.copyFrom(newRotation);
@@ -106,10 +106,12 @@ class SpatialSceneNode extends SceneNode {
     _stale |= SET_ROTATION_FLAGS;
   }
 
+  static const int SET_DIRECTION_FLAGS =
+      FLAG_INVERSE_MATRIX | FLAG_NORMAL_MATRIX | FLAG_INVERSE_NORMAL_MATRIX;
   /**
    * Sets the [direction] of this node to [newDirection], in world space.
    */
-  void setDirection(Vector3 newDirection) {
+  void setDirection(Vector3 newDirection, [Vector3 up]) {
     Vector3 _norm = new Vector3.copy(newDirection);
     Vector3 view = direction;
     num magSq = newDirection.dot(newDirection);
@@ -122,20 +124,27 @@ class SpatialSceneNode extends SceneNode {
       _norm[2] = -1;
     }
 
-    // fixme : if up is provided
+    if (up != null) {
+      _up = up;
+      _direction.setFrom(_norm);
+      _norm.crossInto(_up, _right).normalize();
+      _right.crossInto(_norm, _up).normalize();
 
-    // if not up
-//    rotation = quat.rotationTo _quat, @get('direction'), _norm
-//    @rotateQuat rotation
-//    @set 'direction', vec3.copy view, _norm
-//    @stale ^= FLAGS.direction
+      _setQuaternionAxes(_rotation, _direction, _right, _up);
+      _matrix.setFromTranslationRotation(position, _rotation);
 
-    Quaternion rotation = new Quaternion.identity();
-    _setQuaternionBetween(rotation, direction, _norm);
-    rotateQuat(rotation);
+//      _up = up;
 
-    _direction.setFrom(_norm);
-    _doNotRecalculate(FLAG_DIRECTION);
+      _stale |= SET_DIRECTION_FLAGS;
+    } else {
+      Quaternion rotation = new Quaternion.identity();
+      _setQuaternionBetween(rotation, direction, _norm);
+      rotateQuat(rotation);
+
+      _direction.setFrom(_norm);
+      _doNotRecalculate(FLAG_DIRECTION);
+    }
+
 
   }
 
@@ -154,14 +163,10 @@ class SpatialSceneNode extends SceneNode {
   void lookAt(Vector3 eye, Vector3 point, Vector3 up) {
     setViewMatrix(_inverseMatrix, eye, point, up);
     _position.setFrom(eye);
-//    _stale ^= FLAG_INVERSE_MATRIX | FLAG_POSITION;
-//    _stale ^= FLAG_POSITION;
-    _stale |= FLAG_POSITION;
     _stale |= LOOK_AT_FLAGS;
+    // Unsure about the performance trades of this
     _doNotRecalculate(FLAG_INVERSE_MATRIX);
     _doNotRecalculate(FLAG_POSITION);
-//    _stale ^= FLAG_INVERSE_MATRIX;
-    // invalidate frustum, too
   }
 
 
@@ -185,12 +190,15 @@ class SpatialSceneNode extends SceneNode {
       FLAG_UP | FLAG_RIGHT | FLAG_DIRECTION |
       FLAG_ROTATION |
       FLAG_INVERSE_MATRIX | FLAG_NORMAL_MATRIX | FLAG_INVERSE_NORMAL_MATRIX;
-  void rotateQuat(Quaternion q) {
+  /**
+   * Rotates this node by the provided [quaternion].
+   */
+  void rotateQuat(Quaternion quaternion) {
     Vector3 _origin = new Vector3.zero();
     Matrix4 _rotMat = new Matrix4.identity();
-    _rotMat.setFromTranslationRotation(_origin, q);
+    _rotMat.setFromTranslationRotation(_origin, quaternion);
     _matrix = matrix.multiply(_rotMat);
-//    _rotation = rotation. ???
+    // can optimize by computing rotation from here too
 //    @set 'rotation', quat.multiply rotation, newRotation, rotation
     _stale |= ROTATE_QUAT_FLAGS;
   }
@@ -238,6 +246,14 @@ class SpatialSceneNode extends SceneNode {
 
   /// PRIVVIES -----------------------------------------------------------------
 
+  /**
+   * THINK
+   * We need some way to make sure these privates to not collide with
+   * user-defined privates in their own Models extending this class.
+   *
+   * Solutions?
+   */
+
   bool _doNotRecalculate(int attribute_flag) {
     if (_stale & attribute_flag > 0) {
       _stale ^= attribute_flag;
@@ -277,7 +293,7 @@ class SpatialSceneNode extends SceneNode {
 
   Quaternion _getRotation() {
     if (!_doNotRecalculate(FLAG_ROTATION)) {
-      _setAxes(_rotation, direction, right, up);
+      _setQuaternionAxes(_rotation, direction, right, up);
     }
     return _rotation;
   }
@@ -313,6 +329,11 @@ class SpatialSceneNode extends SceneNode {
   /// VECTOR MATH //////////////////////////////////////////////////////////////
 
   /**
+   * Below are methods that would be better off in the vector_math lib.
+   * They're mostly stolen from javascript's glmatrix library.
+   */
+
+  /**
    * Sets the specified quaternion with values corresponding to the given
    * axes. Each axis is a Vector3 and is expected to be unit length and
    * perpendicular to all the other specified axes.
@@ -321,7 +342,7 @@ class SpatialSceneNode extends SceneNode {
    * @param {Vector3} right the vector representing the local "right" direction
    * @param {Vector3} up    the vector representing the local "up" direction
    */
-  Quaternion _setAxes(Quaternion out, Vector3 view, Vector3 right, Vector3 up) {
+  Quaternion _setQuaternionAxes(Quaternion out, Vector3 view, Vector3 right, Vector3 up) {
     Matrix3 matr = new Matrix3.zero();
 
     matr[0] = right[0];
@@ -376,30 +397,6 @@ class SpatialSceneNode extends SceneNode {
 
     return out;
   }
-
-
-//  var dot = vec3.dot(a, b);
-//  if (dot < -0.999999) {
-//      vec3.cross(tmpvec3, xUnitVec3, a);
-//      if (vec3.length(tmpvec3) < 0.000001)
-//          vec3.cross(tmpvec3, yUnitVec3, a);
-//      vec3.normalize(tmpvec3, tmpvec3);
-//      quat.setAxisAngle(out, tmpvec3, Math.PI);
-//      return out;
-//  } else if (dot > 0.999999) {
-//      out[0] = 0;
-//      out[1] = 0;
-//      out[2] = 0;
-//      out[3] = 1;
-//      return out;
-//  } else {
-//      vec3.cross(tmpvec3, a, b);
-//      out[0] = tmpvec3[0];
-//      out[1] = tmpvec3[1];
-//      out[2] = tmpvec3[2];
-//      out[3] = 1 + dot;
-//      return quat.normalize(out, out);
-//  }
 
 
   /**

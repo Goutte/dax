@@ -25,6 +25,17 @@ class Demo02Material01 extends Material {
     layers.add(new BitmapTextureLayer(new ImageElement(src: "texture/brain.png")));
   }
 }
+/**
+ * A simple material that loads the image `texture/goutte.png` as texture.
+ * Notice the BitmapTextureLayer
+ */
+class DemoGobanMaterial extends Material {
+  DemoGobanMaterial() : super() {
+    layers.add(new PositionLayer());
+    layers.add(new ColorLayer());
+    layers.add(new BitmapTextureLayer(new ImageElement(src: "texture/goban_lines.png")));
+  }
+}
 
 /**
  * A simple material that loads the image `texture/brain.png` as texture.
@@ -72,6 +83,15 @@ class DemoSquareModel02 extends Model {
   }
 }
 
+class DemoGobanModel extends Model {
+  Mesh _mesh = new QuadsphereMesh();
+  Mesh get mesh => _mesh;
+  Material material = new DemoGobanMaterial();
+  void update(num time, num delta) {
+    rotate(-delta*O/84, unitY);
+  }
+}
+
 /**
  * We define our Demo Controller that will set up the world's models.
  */
@@ -82,6 +102,7 @@ class Demo02 extends Controller {
     square = new DemoSquareModel();
     world.add(square);
     world.add(new DemoSquareModel02());
+    world.add(new DemoGobanModel());
   }
 }
 
