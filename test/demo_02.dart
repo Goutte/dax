@@ -32,7 +32,8 @@ class Demo02Material01 extends Material {
 class DemoGobanMaterial extends Material {
   DemoGobanMaterial() : super() {
     layers.add(new PositionLayer());
-    layers.add(new ColorLayer());
+//    layers.add(new ColorLayer());
+    layers.add(new DidiLayer());
     layers.add(new BitmapTextureLayer(new ImageElement(src: "texture/goban_lines.png")));
   }
 }
@@ -40,11 +41,18 @@ class DemoGobanMaterial extends Material {
 /**
  * A simple material that loads the image `texture/brain.png` as texture.
  * It demoes the sweeter BitmapTextureLayer.src() factory.
+ *
+ * About PNG textures :
+ * - nothing:
+ * - background:
+ * - color:
+ * - background and color:
  */
 class Demo02Material02 extends Material {
   Demo02Material02() : super() {
     layers.add(new PositionLayer());
     layers.add(new ColorLayer());
+    ///
     layers.add(new BitmapTextureLayer.src("texture/background_and_color.png"));
   }
 }
@@ -84,7 +92,7 @@ class DemoSquareModel02 extends Model {
 }
 
 class DemoGobanModel extends Model {
-  Mesh _mesh = new QuadsphereMesh();
+  Mesh _mesh = new QuadsphereMesh(complexity: 9);
   Mesh get mesh => _mesh;
   Material material = new DemoGobanMaterial();
   void update(num time, num delta) {
@@ -96,13 +104,10 @@ class DemoGobanModel extends Model {
  * We define our Demo Controller that will set up the world's models.
  */
 class Demo02 extends Controller {
-  Model square;
-
   Demo02(CanvasElement canvas, Stats stats) : super(canvas, stats: stats) {
-    square = new DemoSquareModel();
-    world.add(square);
-    world.add(new DemoSquareModel02());
     world.add(new DemoGobanModel());
+    world.add(new DemoSquareModel());
+    world.add(new DemoSquareModel02());
   }
 }
 

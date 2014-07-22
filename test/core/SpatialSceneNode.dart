@@ -36,7 +36,6 @@ Matcher ishVector3(num x, num y, num z) => new IsVector3Matcher(x,y,z,1e-15);
 
 main() {
 
-
   test('has default spatial attributes', () {
     SpatialSceneNode node = new SpatialSceneNode();
 
@@ -62,6 +61,35 @@ main() {
     expect(node.direction, ishVector3(1.0,0.0,0.0));
   });
 
+
+  /**
+   * Student test, not really a dax test.
+   */
+  test('bitwise operators', () {
+    int z = 0x000;
+    int a = 0x001;
+    int b = 0x002;
+    int c = 0x004;
+    int d = 0x008;
+    int h = 0x080;
+
+    expect(a & z > 0, isFalse);
+    expect(a & b > 0, isFalse);
+    expect(a & c > 0, isFalse);
+    expect(a & d > 0, isFalse);
+    expect(a & h > 0, isFalse);
+    expect(h & z > 0, isFalse);
+    expect(h & a > 0, isFalse);
+
+    z |= a | b | h ;
+    expect(z & a > 0, isTrue);
+    expect(z & b > 0, isTrue);
+    expect(z & h > 0, isTrue);
+
+    z ^= b;
+    expect(z & b > 0, isFalse);
+    expect(z & h > 0, isTrue);
+  });
 
 }
 

@@ -54,6 +54,9 @@ class SpatialSceneNode extends SceneNode {
 
   /// GETTERS ------------------------------------------------------------------
 
+  /// debug
+  int get stale => _stale;
+
   /// The spatial and cartesian (x,y,z) [position] of this node.
   Vector3 get position => _getPosition();
   /// A (normalized) cartesian vector in world space, looking [right].
@@ -133,8 +136,6 @@ class SpatialSceneNode extends SceneNode {
       _setQuaternionAxes(_rotation, _direction, _right, _up);
       _matrix.setFromTranslationRotation(position, _rotation);
 
-//      _up = up;
-
       _stale |= SET_DIRECTION_FLAGS;
     } else {
       Quaternion rotation = new Quaternion.identity();
@@ -181,7 +182,8 @@ class SpatialSceneNode extends SceneNode {
    * It makes no difference whether [alongAxis] is normalized or not.
    */
   void rotate(num amountInRadians, Vector3 alongAxis) {
-    _matrix = matrix.rotate(alongAxis, amountInRadians);
+    _matrix = matrix;
+    _matrix = _matrix.rotate(alongAxis, amountInRadians);
     _stale |= ROTATE_FLAGS;
   }
 
@@ -214,7 +216,8 @@ class SpatialSceneNode extends SceneNode {
    *   => returns a Vector3 equal to node.up
    */
   Vector3 positionInWorld3(Vector3 out, Vector3 localVector3) {
-    return matrix.transformed3(localVector3, out);
+    _matrix = matrix;
+    return _matrix.transformed3(localVector3, out);
   }
 
   /**
@@ -226,21 +229,24 @@ class SpatialSceneNode extends SceneNode {
    *   => returns a Vector3 equal to (0.0, 1.0, 0.0)
    */
   Vector3 positionInLocal3(Vector3 out, Vector3 worldVector3) {
-    return inverseMatrix.transformed3(worldVector3, out);
+    _inverseMatrix = inverseMatrix;
+    return _inverseMatrix.transformed3(worldVector3, out);
   }
 
   /**
    * fixme
    */
   Vector3 directionInWorld3(Vector3 out, Vector3 localVector3) {
-    return normalMatrix.transformed(localVector3, out);
+    _normalMatrix = normalMatrix;
+    return _normalMatrix.transformed(localVector3, out);
   }
 
   /**
    * fixme
    */
   Vector3 directionInLocal3(Vector3 out, Vector3 worldVector3) {
-    return inverseNormalMatrix.transformed(worldVector3, out);
+    _inverseNormalMatrix = inverseNormalMatrix;
+    return _inverseNormalMatrix.transformed(worldVector3, out);
   }
 
 
@@ -254,9 +260,14 @@ class SpatialSceneNode extends SceneNode {
    * Solutions?
    */
 
-  bool _doNotRecalculate(int attribute_flag) {
-    if (_stale & attribute_flag > 0) {
-      _stale ^= attribute_flag;
+
+  void _doRecalculate(int flag) {
+      _stale |= flag;
+  }
+
+  bool _doNotRecalculate(int flag) {
+    if (_stale & flag > 0) {
+      _stale ^= flag;
       return false;
     } else {
       return true;
@@ -300,14 +311,14 @@ class SpatialSceneNode extends SceneNode {
 
   Matrix4 _getMatrix() {
     if (!_doNotRecalculate(FLAG_MATRIX)) {
-      _matrix.copyInverse(inverseMatrix);
+      _matrix.copyInverse(_inverseMatrix);
     }
     return _matrix;
   }
 
   Matrix4 _getInverseMatrix() {
     if (!_doNotRecalculate(FLAG_INVERSE_MATRIX)) {
-      _inverseMatrix.copyInverse(matrix);
+      _inverseMatrix.copyInverse(_matrix);
     }
     return _inverseMatrix;
   }
@@ -426,7 +437,7 @@ class SpatialSceneNode extends SceneNode {
         // Calculate the determinant
         det = b00 * b11 - b01 * b10 + b02 * b09 + b03 * b08 - b04 * b07 + b05 * b06;
 
-    if (!det) { return out; }
+    if (det == 0) { return out; }
     det = 1.0 / det;
 
     out[0] = (a11 * b11 - a12 * b10 + a13 * b09) * det;
