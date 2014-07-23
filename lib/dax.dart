@@ -29,6 +29,9 @@ part 'src/core/Texture.dart';
 part 'src/core/WebGLRenderer.dart';
 part 'src/core/World.dart';
 
+part 'src/error/WebGLException.dart';
+part 'src/error/ShaderError.dart';
+
 part 'src/layer/DidiLayer.dart';
 part 'src/layer/ColorLayer.dart';
 part 'src/layer/PositionLayer.dart';

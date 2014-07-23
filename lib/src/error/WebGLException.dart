@@ -4,7 +4,7 @@ part of dax;
 /**
  * Thrown when there's a problem with WebGL.
  */
-class WebGLException {}
+class WebGLException extends Exception {}
 
 
 /**

@@ -9,9 +9,9 @@ part of dax;
  * the attributes, uniforms and varyings.
  *
  * WARNING :
- * The preprocessor is still quite dumb, and ignores all extra code
- * outside of the main that is not attribute/uniform declaration.
- * Therefore, #includes don't not work (yet).
+ * The preprocessor is still quite dumb, and does not mangle all extra code
+ * outside of the main that is not a GLSL variable declaration.
+ * Also, #includes don't not work (yet).
  */
 class Material {
 
@@ -30,7 +30,7 @@ class Material {
   String get name => this.runtimeType.toString();
 
   /// The [values] of the uniforms and attributes passed to the shader,
-  /// indexed by their mangled variable name.
+  /// indexed by their mangled (or not, if shared) variable name.
   /// You can change this whenever you want using setLayerVariable(),
   /// but not by editing this Map directly, unless you mangle the key yourself.
   Map<String, dynamic> values = {};
@@ -102,6 +102,14 @@ class Material {
 
   /// PRIVVIES -----------------------------------------------------------------
 
+  String _mangleIfNecessary(String variableName, MaterialLayer ofLayer) {
+    if (! _mangledNames.containsKey(variableName)) {
+      throw new Exception("Variable $variableName was not registered");
+    }
+    return _mangledNames[variableName];
+//    return "${ofLayer.name}_${variableName}";
+  }
+
   void _setLayerVariable(MaterialLayer layer, String variableName, value,
                          {bool clobber: true}) {
     if (value is Vector2 ||
@@ -114,7 +122,9 @@ class Material {
     } else if (value is List && !(value is TypedData)) {
       value = new Float32List.fromList(value);
     }
-    String mangledName = "${layer.name}_${variableName}";
+
+    String mangledName = _mangleIfNecessary(variableName, layer);
+
     if (clobber || !values.containsKey(mangledName)) {
       values[mangledName] = value;
     }
@@ -184,42 +194,71 @@ class Material {
     return _fragment;
   }
 
+  Map<String, String> _mangledNames = {};
+
   /**
    * Merges [uid] (uniquely identified) shader [from], [into] another shader.
    *
-   * Warning: this appends without mangling the `other`. Collisions !
+   * Warning: this appends without mangling the `other`. Collisions WILL happen!
    */
-  Shader _mergeShaders(String uid, Shader from, Shader into) {
+  void _mergeShaders(String uid, Shader from, Shader into) {
     String mangledContents = '';
     if (from.main != null) {
       mangledContents = from.main.contents;
     }
 
     for (GlslAttribute attribute in from.attributes) {
-      String mangledName = uid + '_' + attribute.name;
-      GlslAttribute mangledAttribute = new GlslAttribute(attribute.type, mangledName);
-      into.attributes.add(mangledAttribute);
-      mangledContents = mangledContents.replaceAllMapped(
-          new RegExp(r"(\b)("+attribute.name+r")(\b)"),
-          (Match m) => "${m[1]}${mangledName}${m[3]}");
+      if (attribute.shared) {
+        // if not already present (added by any previous layer)
+        if (! into.attributes.contains(attribute)) {
+          _mangledNames[attribute.name] = attribute.name;
+          into.attributes.add(attribute);
+        }
+      } else {
+        String mangledName = uid + '_' + attribute.name;
+        _mangledNames[attribute.name] = mangledName;
+        GlslAttribute mangledAttribute = new GlslAttribute(attribute.type, mangledName);
+        into.attributes.add(mangledAttribute);
+        mangledContents = mangledContents.replaceAllMapped(
+            new RegExp(r"(\b)("+attribute.name+r")(\b)"),
+            (Match m) => "${m[1]}${mangledName}${m[3]}");
+      }
     }
 
     for (GlslUniform uniform in from.uniforms) {
-      String mangledName = uid + '_' + uniform.name;
-      GlslUniform mangledUniform = new GlslUniform(uniform.type, mangledName);
-      into.uniforms.add(mangledUniform);
-      mangledContents = mangledContents.replaceAllMapped(
-          new RegExp(r"(\b)("+uniform.name+r")(\b)"),
-          (Match m) => "${m[1]}${mangledName}${m[3]}");
+      if (uniform.shared) {
+        // if not already present (added by any previous layer)
+        if (! into.uniforms.contains(uniform)) {
+          _mangledNames[uniform.name] = uniform.name;
+          into.uniforms.add(uniform);
+        }
+      } else {
+        String mangledName = uid + '_' + uniform.name;
+        _mangledNames[uniform.name] = mangledName;
+        GlslUniform mangledUniform = new GlslUniform(uniform.type, mangledName);
+        into.uniforms.add(mangledUniform);
+        mangledContents = mangledContents.replaceAllMapped(
+            new RegExp(r"(\b)("+uniform.name+r")(\b)"),
+            (Match m) => "${m[1]}${mangledName}${m[3]}");
+      }
     }
 
     for (GlslVarying varying in from.varyings) {
-      String mangledName = uid + '_' + varying.name;
-      GlslVarying mangledVarying = new GlslVarying(varying.type, mangledName);
-      into.varyings.add(mangledVarying);
-      mangledContents = mangledContents.replaceAllMapped(
-          new RegExp(r"(\b)("+varying.name+r")(\b)"),
-          (Match m) => "${m[1]}${mangledName}${m[3]}");
+      if (varying.shared) {
+          _mangledNames[varying.name] = varying.name;
+        // if not already present (added by any previous layer)
+        if (! into.varyings.contains(varying)) {
+          into.varyings.add(varying);
+        }
+      } else {
+        String mangledName = uid + '_' + varying.name;
+        _mangledNames[varying.name] = mangledName;
+        GlslVarying mangledVarying = new GlslVarying(varying.type, mangledName);
+        into.varyings.add(mangledVarying);
+        mangledContents = mangledContents.replaceAllMapped(
+            new RegExp(r"(\b)("+varying.name+r")(\b)"),
+            (Match m) => "${m[1]}${mangledName}${m[3]}");
+      }
     }
 
     // warning: collisions detected -- should also (somehow) mangle the other

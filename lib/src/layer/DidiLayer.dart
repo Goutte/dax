@@ -10,7 +10,7 @@ class DidiLayer extends MaterialLayer {
 varying float zPos;
 
 void main(void) {
-    zPos = gl_Position[1];
+    zPos = VERTEX_POSITION[1];
 }
   """;
   String get glslFragment => """

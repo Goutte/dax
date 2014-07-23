@@ -5,6 +5,9 @@ class GlslVariable {
   String name;
   String type;
 
+  /// A [shared] variable (between layers) does no submit to [name]-mangling.
+  bool shared = false;
+
   /// The number of elements (floats, ints) of the [type] of this variable.
   int get size => _getSize();
 

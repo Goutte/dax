@@ -15,12 +15,11 @@ import '../../lib/dax.dart';
  *   - attribute
  *   - uniform
  *   - varying
- * -
- * Todo support :
- * - varying int a, b, c;
+ * - multiple declarations on one line using `,`
  * - shared attribute
  * - shared uniform
  * - shared varying
+ * Todo support :
  * - include
  */
 
@@ -70,10 +69,16 @@ vec3 rainbow(float x)
 void main(void) {}
   """;
   String get glslVertex => """
+shared attribute vec3 A_SHARED_BY_A;
+shared attribute vec3 A_SHARED_BY_AB;
 attribute vec3 aTest;
 attribute vec3 aOne, aTwo, aKri;
+shared uniform vec3 U_SHARED_BY_A;
+shared uniform vec3 U_SHARED_BY_AB;
 uniform vec3 u1, u2, u3;
 uniform mat4 uTest;
+shared varying vec3 V_SHARED_BY_A;
+shared varying vec3 V_SHARED_BY_AB;
 varying vec3 vPos;
 varying vec3 v_uno, v_dos, v_kro;
 
@@ -93,7 +98,11 @@ void main(void) {
 }
   """;
   String get glslVertex => """
+shared attribute vec3 A_SHARED_BY_AB;
+shared uniform vec3 U_SHARED_BY_AB;
+shared varying vec3 V_SHARED_BY_AB;
 uniform mat4 uTest;
+
 void main(void) {
     // nothing
 }
@@ -108,15 +117,21 @@ main() {
   test('merges layers GLSL', () {
     Material material = new TestMaterial();
     String expectedVertex = """
+attribute vec3 A_SHARED_BY_A;
+attribute vec3 A_SHARED_BY_AB;
 attribute vec3 TestLayerA_aTest;
 attribute vec3 TestLayerA_aOne;
 attribute vec3 TestLayerA_aTwo;
 attribute vec3 TestLayerA_aKri;
+uniform vec3 U_SHARED_BY_A;
+uniform vec3 U_SHARED_BY_AB;
 uniform vec3 TestLayerA_u1;
 uniform vec3 TestLayerA_u2;
 uniform vec3 TestLayerA_u3;
 uniform mat4 TestLayerA_uTest;
 uniform mat4 TestLayerB_uTest;
+varying vec3 V_SHARED_BY_A;
+varying vec3 V_SHARED_BY_AB;
 varying vec3 TestLayerA_vPos;
 varying vec3 TestLayerA_v_uno;
 varying vec3 TestLayerA_v_dos;

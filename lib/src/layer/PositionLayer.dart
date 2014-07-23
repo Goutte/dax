@@ -9,7 +9,7 @@ class PositionLayer extends MaterialLayer {
 
   String get glslFragment => "";
   String get glslVertex => """
-attribute vec3 VERTEX_POSITION;
+shared attribute vec3 VERTEX_POSITION;
 
 uniform mat4 uMMatrix;
 uniform mat4 uVMatrix;

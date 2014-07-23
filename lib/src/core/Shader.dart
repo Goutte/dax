@@ -69,43 +69,49 @@ class Shader {
 
     // `.` does not match carriage returns, even with multiLine, but \s does.
     RegExp attributeRegex = new RegExp(
-        r"attribute\s+([\w]+)\s+((?:[\w]+\s*,?\s*)+);", multiLine: true);
+        r"(shared|)\s*attribute\s+([\w]+)\s+((?:[\w]+\s*,?\s*)+);", multiLine: true);
     RegExp uniformRegex = new RegExp(
-        r"uniform\s+([\w]+)\s+((?:[\w]+\s*,?\s*)+);", multiLine: true);
+        r"(shared|)\s*uniform\s+([\w]+)\s+((?:[\w]+\s*,?\s*)+);", multiLine: true);
     RegExp varyingRegex = new RegExp(
-        r"varying\s+([\w]+)\s+((?:[\w]+\s*,?\s*)+);", multiLine: true);
+        r"(shared|)\s*varying\s+([\w]+)\s+((?:[\w]+\s*,?\s*)+);", multiLine: true);
     RegExp mainRegex = new RegExp(
         r"void main\s*\([^)]*\)\s*\{((?:.|\s)*)\}", multiLine: true);
 
-
+    // List of [start, end] so that we may collect all not-regex-collected code.
     List weGotIt = [];
 
     for (Match match in attributeRegex.allMatches(glsl)) {
       weGotIt.add([match.start, match.end]);
-      String type = match.group(1);
-      List names = match.group(2).split(",");
+      bool shared = match.group(1).isNotEmpty;
+      String type = match.group(2);
+      List names = match.group(3).split(",");
       for (String name in names) {
         GlslAttribute attribute = new GlslAttribute(type, name.trim());
+        attribute.shared = shared;
         attributes.add(attribute);
       }
     }
 
     for (Match match in uniformRegex.allMatches(glsl)) {
       weGotIt.add([match.start, match.end]);
-      String type = match.group(1);
-      List names = match.group(2).split(",");
+      bool shared = match.group(1).isNotEmpty;
+      String type = match.group(2);
+      List names = match.group(3).split(",");
       for (String name in names) {
         GlslUniform uniform = new GlslUniform(type, name.trim());
+        uniform.shared = shared;
         uniforms.add(uniform);
       }
     }
 
     for (Match match in varyingRegex.allMatches(glsl)) {
       weGotIt.add([match.start, match.end]);
-      String type = match.group(1);
-      List names = match.group(2).split(",");
+      bool shared = match.group(1).isNotEmpty;
+      String type = match.group(2);
+      List names = match.group(3).split(",");
       for (String name in names) {
         GlslVarying varying = new GlslVarying(type, name.trim());
+        varying.shared = shared;
         varyings.add(varying);
       }
     }
