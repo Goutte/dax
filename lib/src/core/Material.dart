@@ -19,6 +19,10 @@ class Material {
 
   Shader _vertex;
   Shader _fragment;
+  /// Maps the names of the variables as defined in the layers' shaders to
+  /// the names of the variable as defined in this material's shader.
+  /// If two layers
+//  Map<String, String> _mangledNames = {};
 
   Shader get vertex => _generateVertexShader();
   Shader get fragment => _generateFragmentShader();
@@ -87,6 +91,15 @@ class Material {
     }
   }
 
+
+  /**
+   * Returns the mangled (if necessary, ie if not shared) name of [variableName]
+   * defined [inLayer].
+   */
+  String getMangledName(String variableName, MaterialLayer inLayer) {
+    return inLayer.getMangledName(variableName);
+  }
+
   // unsure about this
   bool _areLayersSetup = false;
   void setupLayersIfNecessary(World world, Model model, Renderer renderer) {
@@ -102,13 +115,6 @@ class Material {
 
   /// PRIVVIES -----------------------------------------------------------------
 
-  String _mangleIfNecessary(String variableName, MaterialLayer ofLayer) {
-    if (! _mangledNames.containsKey(variableName)) {
-      throw new Exception("Variable $variableName was not registered");
-    }
-    return _mangledNames[variableName];
-//    return "${ofLayer.name}_${variableName}";
-  }
 
   void _setLayerVariable(MaterialLayer layer, String variableName, value,
                          {bool clobber: true}) {
@@ -123,7 +129,7 @@ class Material {
       value = new Float32List.fromList(value);
     }
 
-    String mangledName = _mangleIfNecessary(variableName, layer);
+    String mangledName = getMangledName(variableName, layer);
 
     if (clobber || !values.containsKey(mangledName)) {
       values[mangledName] = value;
@@ -194,8 +200,6 @@ class Material {
     return _fragment;
   }
 
-  Map<String, String> _mangledNames = {};
-
   /**
    * Merges [uid] (uniquely identified) shader [from], [into] another shader.
    *
@@ -211,12 +215,10 @@ class Material {
       if (attribute.shared) {
         // if not already present (added by any previous layer)
         if (! into.attributes.contains(attribute)) {
-          _mangledNames[attribute.name] = attribute.name;
           into.attributes.add(attribute);
         }
       } else {
         String mangledName = uid + '_' + attribute.name;
-        _mangledNames[attribute.name] = mangledName;
         GlslAttribute mangledAttribute = new GlslAttribute(attribute.type, mangledName);
         into.attributes.add(mangledAttribute);
         mangledContents = mangledContents.replaceAllMapped(
@@ -229,12 +231,10 @@ class Material {
       if (uniform.shared) {
         // if not already present (added by any previous layer)
         if (! into.uniforms.contains(uniform)) {
-          _mangledNames[uniform.name] = uniform.name;
           into.uniforms.add(uniform);
         }
       } else {
         String mangledName = uid + '_' + uniform.name;
-        _mangledNames[uniform.name] = mangledName;
         GlslUniform mangledUniform = new GlslUniform(uniform.type, mangledName);
         into.uniforms.add(mangledUniform);
         mangledContents = mangledContents.replaceAllMapped(
@@ -245,14 +245,12 @@ class Material {
 
     for (GlslVarying varying in from.varyings) {
       if (varying.shared) {
-          _mangledNames[varying.name] = varying.name;
         // if not already present (added by any previous layer)
         if (! into.varyings.contains(varying)) {
           into.varyings.add(varying);
         }
       } else {
         String mangledName = uid + '_' + varying.name;
-        _mangledNames[varying.name] = mangledName;
         GlslVarying mangledVarying = new GlslVarying(varying.type, mangledName);
         into.varyings.add(mangledVarying);
         mangledContents = mangledContents.replaceAllMapped(

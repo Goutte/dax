@@ -27,6 +27,10 @@ class Shader {
   /// This may be the place to put all the code that resides outside of main().
   String other = '';
 
+  /// All uniforms, attributes and varyings.
+  /// Re-collects the list each time.
+  List<GlslVariable> get variables => _collectVariables();
+
   /// CONSTRUCTORS -------------------------------------------------------------
 
   Shader([String glsl = '']) {
@@ -64,6 +68,20 @@ class Shader {
   }
 
   /// PRIVY --------------------------------------------------------------------
+
+  List<GlslVariable> _collectVariables() {
+    List<GlslVariable> _variables = [];
+    for (GlslAttribute attribute in attributes) {
+      _variables.add(attribute);
+    }
+    for (GlslUniform uniform in uniforms) {
+      _variables.add(uniform);
+    }
+    for (GlslVarying varying in varyings) {
+      _variables.add(varying);
+    }
+    return _variables;
+  }
 
   _parseGlsl(String glsl) {
 
