@@ -69,33 +69,39 @@ class Shader {
 
     // `.` does not match carriage returns, even with multiLine, but \s does.
     RegExp attributeRegex = new RegExp(
-        r"attribute\s+([a-zA-Z0-9_]+)\s+([a-zA-Z0-9_]+)\s*;", multiLine: true);
+        r"attribute\s+([\w]+)\s+((?:[\w]+\s*,?\s*)+);", multiLine: true);
     RegExp uniformRegex = new RegExp(
-        r"uniform\s+([a-zA-Z0-9_]+)\s+([a-zA-Z0-9_]+)\s*;", multiLine: true);
+        r"uniform\s+([\w]+)\s+((?:[\w]+\s*,?\s*)+);", multiLine: true);
     RegExp varyingRegex = new RegExp(
-        r"varying\s+([a-zA-Z0-9_]+)\s+([a-zA-Z0-9_]+)\s*;", multiLine: true);
+        r"varying\s+([\w]+)\s+((?:[\w]+\s*,?\s*)+);", multiLine: true);
     RegExp mainRegex = new RegExp(
         r"main\s*\([^)]*\)\s*\{((?:.|\s)*)\}", multiLine: true);
 
     for (Match match in attributeRegex.allMatches(glsl)) {
       String type = match.group(1);
-      String name = match.group(2);
-      GlslAttribute attribute = new GlslAttribute(type, name);
-      attributes.add(attribute);
+      List names = match.group(2).split(",");
+      for (String name in names) {
+        GlslAttribute attribute = new GlslAttribute(type, name.trim());
+        attributes.add(attribute);
+      }
     }
 
     for (Match match in uniformRegex.allMatches(glsl)) {
       String type = match.group(1);
-      String name = match.group(2);
-      GlslUniform uniform = new GlslUniform(type, name);
-      uniforms.add(uniform);
+      List names = match.group(2).split(",");
+      for (String name in names) {
+        GlslUniform uniform = new GlslUniform(type, name.trim());
+        uniforms.add(uniform);
+      }
     }
 
     for (Match match in varyingRegex.allMatches(glsl)) {
       String type = match.group(1);
-      String name = match.group(2);
-      GlslVarying varying = new GlslVarying(type, name);
-      varyings.add(varying);
+      List names = match.group(2).split(",");
+      for (String name in names) {
+        GlslVarying varying = new GlslVarying(type, name.trim());
+        varyings.add(varying);
+      }
     }
 
     if (mainRegex.hasMatch(glsl)) {
