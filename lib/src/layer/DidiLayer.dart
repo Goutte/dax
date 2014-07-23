@@ -6,10 +6,18 @@ part of dax;
  */
 class DidiLayer extends MaterialLayer {
 
+  String get glslVertex => """
+varying float zPos;
+
+void main(void) {
+    zPos = gl_Position[1];
+}
+  """;
   String get glslFragment => """
 uniform vec3 uColor;
 uniform float uAlpha;
 
+varying float zPos;
 
 vec3 rainbow(float x)
 {
@@ -34,7 +42,7 @@ vec3 rainbow(float x)
 }
 
 void main(void) {
-    gl_FragColor = vec4(uColor, uAlpha);
+    gl_FragColor = vec4(rainbow(zPos), uAlpha);
 }
   """;
 
@@ -50,6 +58,7 @@ void main(void) {
     _t += 0.02;
     double _red = (sin(_t) + 1) / 2;
     return {
+//      'uTime': new Vector3(_red, 1.0-_red, 0.5),
       'uColor': new Vector3(_red, 1.0-_red, 0.5),
     };
   }

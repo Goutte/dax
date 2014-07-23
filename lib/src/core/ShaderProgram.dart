@@ -49,6 +49,7 @@ class ShaderProgram {
       print("Could not initialize shaders!");
       print("FRAGMENT :\n${fragmentGlsl}");
       print("VERTEX :\n${vertexGlsl}");
+      //print("gl.getError() returns ${gl.getError()}");
     }
 
     for (GlslAttribute attribute in attributes) {

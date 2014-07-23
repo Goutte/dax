@@ -184,7 +184,11 @@ class Material {
     return _fragment;
   }
 
-
+  /**
+   * Merges [uid] (uniquely identified) shader [from], [into] another shader.
+   *
+   * Warning: this appends without mangling the `other`. Collisions !
+   */
   Shader _mergeShaders(String uid, Shader from, Shader into) {
     String mangledContents = '';
     if (from.main != null) {
@@ -217,6 +221,9 @@ class Material {
           new RegExp(r"(\b)("+varying.name+r")(\b)"),
           (Match m) => "${m[1]}${mangledName}${m[3]}");
     }
+
+    // warning: collisions detected -- should also (somehow) mangle the other
+    into.other += from.other;
 
     into.other += "void main_${uid}(void) {${mangledContents}}\n";
     into.main.contents += "main_${uid}();\n";

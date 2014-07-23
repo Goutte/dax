@@ -75,9 +75,13 @@ class Shader {
     RegExp varyingRegex = new RegExp(
         r"varying\s+([\w]+)\s+((?:[\w]+\s*,?\s*)+);", multiLine: true);
     RegExp mainRegex = new RegExp(
-        r"main\s*\([^)]*\)\s*\{((?:.|\s)*)\}", multiLine: true);
+        r"void main\s*\([^)]*\)\s*\{((?:.|\s)*)\}", multiLine: true);
+
+
+    List weGotIt = [];
 
     for (Match match in attributeRegex.allMatches(glsl)) {
+      weGotIt.add([match.start, match.end]);
       String type = match.group(1);
       List names = match.group(2).split(",");
       for (String name in names) {
@@ -87,6 +91,7 @@ class Shader {
     }
 
     for (Match match in uniformRegex.allMatches(glsl)) {
+      weGotIt.add([match.start, match.end]);
       String type = match.group(1);
       List names = match.group(2).split(",");
       for (String name in names) {
@@ -96,6 +101,7 @@ class Shader {
     }
 
     for (Match match in varyingRegex.allMatches(glsl)) {
+      weGotIt.add([match.start, match.end]);
       String type = match.group(1);
       List names = match.group(2).split(",");
       for (String name in names) {
@@ -106,9 +112,23 @@ class Shader {
 
     if (mainRegex.hasMatch(glsl)) {
       Match match = mainRegex.firstMatch(glsl);
+      weGotIt.add([match.start, match.end]);
       String contents = match.group(1);
       main = new GlslMain(contents);
     }
+
+    weGotIt.sort((List a, List b) => a[0].compareTo(b[0]));
+
+    other = '';
+    int s = 0;
+    for (List startEnd in weGotIt) {
+      int e = startEnd[0];
+      if (s < e) {
+        other += glsl.substring(s, e).trim() + "\n";
+      }
+      s = startEnd[1];
+    }
+    other = other;
 
   }
 
