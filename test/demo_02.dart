@@ -18,23 +18,27 @@ import '../lib/dax.dart';
  * A simple material that loads the image `texture/goutte.png` as texture.
  * Notice the BitmapTextureLayer
  */
-class Demo02Material01 extends Material {
-  Demo02Material01() : super() {
-    layers.add(new PositionLayer());
-    layers.add(new ColorLayer());
-    layers.add(new BitmapTextureLayer(new ImageElement(src: "texture/brain.png")));
-  }
-}
-/**
- * A simple material that loads the image `texture/goutte.png` as texture.
- * Notice the BitmapTextureLayer
- */
 class DemoGobanMaterial extends Material {
   DemoGobanMaterial() : super() {
     layers.add(new PositionLayer());
 //    layers.add(new ColorLayer());
     layers.add(new DidiLayer());
-    layers.add(new BitmapTextureLayer(new ImageElement(src: "texture/goban_lines.png")));
+    layers.add(new WoodLayer());
+//    layers.add(new StarLayer());
+//    layers.add(new BitmapTextureLayer(new ImageElement(src: "texture/goban_lines.png")));
+  }
+}
+
+/**
+ * A simple material that loads the image `texture/goutte.png` as texture.
+ * Notice the BitmapTextureLayer
+ */
+class Demo02Material01 extends Material {
+  Demo02Material01() : super() {
+    layers.add(new PositionLayer());
+    layers.add(new ColorLayer());
+    layers.add(new StarLayer());
+//    layers.add(new BitmapTextureLayer(new ImageElement(src: "texture/brain.png")));
   }
 }
 
@@ -92,7 +96,7 @@ class DemoSquareModel02 extends Model {
 }
 
 class DemoGobanModel extends Model {
-  Mesh _mesh = new QuadsphereMesh(complexity: 9);
+  Mesh _mesh = new QuadsphereMesh(complexity: 9, size: 10.0);
   Mesh get mesh => _mesh;
   Material material = new DemoGobanMaterial();
   void update(num time, num delta) {

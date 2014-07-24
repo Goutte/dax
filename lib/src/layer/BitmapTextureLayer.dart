@@ -19,16 +19,13 @@ void main(void) {
     vec4 t = texture2D(uTexture, vTextureCoords * vec2(uTextureScaleX, uTextureScaleY));
     float srcAlpha = t[3];
     float dstAlpha = gl_FragColor[3];
+
+    // hand-made blending with previous layers
     if (srcAlpha == 1.0) {
       gl_FragColor[0] = t[0]; // R
       gl_FragColor[1] = t[1]; // G
       gl_FragColor[2] = t[2]; // B
       gl_FragColor[3] = t[3]; // A
-//    } else if (dstAlpha == 1.0) {
-//      gl_FragColor[0] = t[0]; // R
-//      gl_FragColor[1] = t[1]; // G
-//      gl_FragColor[2] = t[2]; // B
-//      gl_FragColor[3] = t[3]; // A
     } else {
       gl_FragColor[0] = gl_FragColor[0] * t[0]; // R
       gl_FragColor[1] = gl_FragColor[1] * t[1]; // G

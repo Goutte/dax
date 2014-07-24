@@ -50,6 +50,9 @@ class ShaderProgram {
       print("FRAGMENT :\n${fragmentGlsl}");
       print("VERTEX :\n${vertexGlsl}");
       //print("gl.getError() returns ${gl.getError()}");
+      print("Program info log : ${gl.getProgramInfoLog(program)}");
+      print("Fragment info log : ${gl.getShaderInfoLog(fragmentShader)}");
+      print("Vertex info log : ${gl.getShaderInfoLog(vertexShader)}");
     }
 
     for (GlslAttribute attribute in attributes) {

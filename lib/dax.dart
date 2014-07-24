@@ -2,6 +2,7 @@ library dax;
 
 import 'dart:math';
 import 'dart:html';
+import 'dart:collection';
 import 'dart:web_gl' as WebGL;
 import 'dart:typed_data';
 
@@ -32,10 +33,12 @@ part 'src/core/World.dart';
 part 'src/error/WebGLException.dart';
 part 'src/error/ShaderError.dart';
 
-part 'src/layer/DidiLayer.dart';
 part 'src/layer/ColorLayer.dart';
 part 'src/layer/PositionLayer.dart';
 part 'src/layer/BitmapTextureLayer.dart';
+part 'src/layer/DidiLayer.dart';
+part 'src/layer/StarLayer.dart';
+part 'src/layer/WoodLayer.dart';
 
 part 'src/material/DefaultMaterial.dart';
 

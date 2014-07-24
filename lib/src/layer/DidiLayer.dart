@@ -7,17 +7,23 @@ part of dax;
 class DidiLayer extends MaterialLayer {
 
   String get glslVertex => """
-varying float zPos;
+uniform float uMinY;
+uniform float uMaxY;
+varying float rainbowPos;
 
 void main(void) {
-    zPos = VERTEX_POSITION[1];
+  if (uMaxY == uMinY) {
+    rainbowPos = 0.0;
+  } else {
+    rainbowPos = ( VERTEX_POSITION[1] - uMinY ) / ( uMaxY - uMinY );
+  }
 }
   """;
   String get glslFragment => """
 uniform vec3 uColor;
 uniform float uAlpha;
 
-varying float zPos;
+varying float rainbowPos;
 
 vec3 rainbow(float x)
 {
@@ -42,13 +48,15 @@ vec3 rainbow(float x)
 }
 
 void main(void) {
-    gl_FragColor = vec4(rainbow(zPos), uAlpha);
+    gl_FragColor = vec4(rainbow(rainbowPos), uAlpha);
 }
   """;
 
   Map<String, dynamic> onSetup(World world, Model model, Renderer renderer) {
     return {
       'uAlpha': 1.0,
+      'uMaxY': model.mesh.boundingBox.yMax,
+      'uMinY': model.mesh.boundingBox.yMin,
     };
   }
 
