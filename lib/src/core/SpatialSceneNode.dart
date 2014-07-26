@@ -122,9 +122,9 @@ class SpatialSceneNode extends SceneNode {
       // not a unit vector, normalize it
       _norm.normalize();
     } else if (magSq == 0) {
-      _norm[0] =  0;
-      _norm[1] =  0;
-      _norm[2] = -1;
+      _norm[0] =  0.0;
+      _norm[1] =  0.0;
+      _norm[2] = -1.0;
     }
 
     if (up != null) {
@@ -297,7 +297,7 @@ class SpatialSceneNode extends SceneNode {
 
   Vector3 _getDirection() {
     if (!_doNotRecalculate(FLAG_DIRECTION)) {
-      directionInWorld3(_direction, unitZ * -1);
+      directionInWorld3(_direction, unitZ * -1.0);
     }
     return _direction;
   }

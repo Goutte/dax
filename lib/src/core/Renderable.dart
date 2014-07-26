@@ -6,7 +6,7 @@ part of dax;
  * The Renderer will check if the node is Renderable
  * while traversing the SceneGraph, and if it is, it will render the mesh.
  */
-class Renderable {
+abstract class Renderable {
   Mesh get mesh;
 }
 
@@ -16,6 +16,6 @@ class Renderable {
  * The Renderer will check if the node is Shadable
  * while traversing the SceneGraph, and if it is, it will render the material.
  */
-class Shadable {
+abstract class Shadable {
   Material get material;
 }

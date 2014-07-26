@@ -93,7 +93,7 @@ abstract class Controller extends GameLoopHtml {
     _mouse_wheeled_camera_position.setFrom(world.camera.position);
 
     num strenght = -1/400;
-    _mouse_wheeled_camera_position.add(world.camera.direction * mouse.wheelDy * strenght);
+    _mouse_wheeled_camera_position.add(world.camera.direction * mouse.wheelDy.toDouble() * strenght);
     _mouse_wheeled_camera_position = constrainInCoconut(_mouse_wheeled_camera_position, new Vector3.zero(), minDistance, maxDistance);
     world.camera.setPosition(_mouse_wheeled_camera_position);
   }

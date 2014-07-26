@@ -15,7 +15,7 @@ part of dax;
  *
  * A Model automatically has the default material DefaultMaterial.
  */
-class Model extends SpatialSceneNode implements Renderable, Shadable {
+abstract class Model extends SpatialSceneNode implements Renderable, Shadable {
 
   Material _material = new DefaultMaterial();
   Material get material => _material;

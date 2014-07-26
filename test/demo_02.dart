@@ -27,8 +27,8 @@ class DemoGobanMaterial extends Material {
 //    layers.add(new StarLayer());
 //    layers.add(new BitmapTextureLayer(new ImageElement(src: "texture/goban_lines.png")));
 //    layers.add(new BitmapTextureLayer(new ImageElement(src: "texture/quadsphere/cube_net.jpg")));
-    layers.add(new BitmapTextureLayer(new ImageElement(src: "texture/quadsphere/debug_example.png")));
-//    layers.add(new BitmapTextureLayer(new ImageElement(src: "texture/quadsphere/earth.jpg")));
+//    layers.add(new BitmapTextureLayer(new ImageElement(src: "texture/quadsphere/debug_example.png")));
+    layers.add(new BitmapTextureLayer(new ImageElement(src: "texture/quadsphere/earth.jpg")));
   }
 }
 
@@ -59,8 +59,19 @@ class Demo02Material02 extends Material {
   Demo02Material02() : super() {
     layers.add(new PositionLayer());
     layers.add(new ColorLayer());
-    ///
     layers.add(new BitmapTextureLayer.src("texture/background_and_color.png"));
+  }
+}
+
+/**
+ * A model of a quadspherical goban
+ */
+class DemoGobanModel extends Model {
+  Mesh _mesh = new QuadsphereMesh(complexity: 9, size: 5.0, ySegments: 19);
+  Mesh get mesh => _mesh;
+  Material material = new DemoGobanMaterial();
+  void update(num time, num delta) {
+    rotate(-delta*O/84, unitY);
   }
 }
 
@@ -89,8 +100,6 @@ class DemoSquareModel02 extends Model {
   Material material = new Demo02Material02();
 
   void update(num time, num delta) {
-//    rotate(delta*O/3000, unitY);
-//    setPosition(new Vector3(cos(time/900), sin(time/900), 0.0));
     rotate(delta*O/24, unitY);
     rotate(delta*O/42, unitZ);
     rotate(delta*O/42, unitX);
@@ -98,21 +107,14 @@ class DemoSquareModel02 extends Model {
   }
 }
 
-class DemoGobanModel extends Model {
-  Mesh _mesh = new QuadsphereMesh(complexity: 9, size: 5.0, ySegments: 19);
-  Mesh get mesh => _mesh;
-  Material material = new DemoGobanMaterial();
-  void update(num time, num delta) {
-    rotate(-delta*O/84, unitY);
-  }
-}
-
 /**
  * We define our Demo Controller that will set up the world's models.
  */
 class Demo02 extends Controller {
+  Model goban;
   Demo02(CanvasElement canvas, Stats stats) : super(canvas, stats: stats) {
-    world.add(new DemoGobanModel());
+    goban = new DemoGobanModel();
+    world.add(goban);
     world.add(new DemoSquareModel());
     world.add(new DemoSquareModel02());
   }
@@ -133,7 +135,7 @@ main() {
     document.body.children.add(stats.container);
   }
 
-  Controller demo = new Demo02(canvas, stats);
+  Demo02 demo = new Demo02(canvas, stats);
 
   demo.gl.enable(DEPTH_TEST);
   demo.gl.blendFunc(SRC_ALPHA, ONE_MINUS_SRC_ALPHA);
@@ -141,15 +143,51 @@ main() {
 
   demo.start();
 
-//  demo.startRendering();
-//  demo.startUpdating();
 
-//  demo.
+  /// Some code to change the texture of the quadsphere on-the-fly
+  querySelector("#texture_file").onChange.listen((e){
+    File file = e.currentTarget.files[0];
 
-  //demo.onUpdate = update;
-//  demo.onRender = render;
-//  demo.onResize = resize;
-//  resize(demo);
+    print("Changed texture file to ${file.name}");
+
+    ImageElement tex = new ImageElement();
+    FileReader reader = new FileReader();
+    reader.onLoad.listen((e) {
+      tex.src = reader.result;
+      demo.goban.material.setVariable('BitmapTextureLayer', 'uTexture', new BitmapTexture(tex));
+    });
+    reader.readAsDataUrl(file);
+
+  });
+
+
+  // Oddly enough, drag'n drop of external files does not work on my machine
+  // Even gmail's does not.
+//  canvas.onDrop.listen((e){
+//    print('dropped $e');
+//  });
+//
+//  canvas.onDragEnd.listen((e){
+//    print('drag end $e');
+//  });
+//
+//  canvas.onDragEnter.listen((e){
+//    e.stopPropagation();
+//    e.preventDefault();
+//    print('drag enter $e');
+//  });
+//
+//  canvas.onDragOver.listen((e){
+//    e.stopPropagation();
+//    e.preventDefault();
+//  });
+//
+//  canvas.onDragLeave.listen((e){
+//    e.stopPropagation();
+//    e.preventDefault();
+//    print('drag leave $e');
+//  });
+
 
 
 }

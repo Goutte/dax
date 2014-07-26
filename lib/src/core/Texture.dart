@@ -1,7 +1,7 @@
 part of dax;
 
 
-class Texture {
+abstract class Texture {
   int get target;
   bool get isLoaded;
   ElementStream<Event> get onLoad;

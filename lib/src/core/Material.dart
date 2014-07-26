@@ -106,7 +106,7 @@ class Material {
     if (! _areLayersSetup) {
       _areLayersSetup = true;
       for (MaterialLayer layer in layers) {
-        Map<String, dynamic> valuesMap = layer.onSetup(world, model, this);
+        Map<String, dynamic> valuesMap = layer.onSetup(world, model, renderer);
         setLayerVariables(layer, valuesMap, clobber: false);
       }
     }
@@ -150,7 +150,7 @@ class Material {
     return uniforms;
   }
 
-  List<GlslUniform> _collectVaryings() {
+  List<GlslVarying> _collectVaryings() {
     List<GlslVarying> varyings = [];
     varyings.addAll(vertex.varyings);
     return varyings;
