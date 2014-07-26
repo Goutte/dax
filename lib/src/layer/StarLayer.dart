@@ -2,14 +2,11 @@ part of dax;
 
 
 /**
- * SUN based on https://www.shadertoy.com/view/4dXGR4
+ * Star based on https://www.shadertoy.com/view/4dXGR4
  */
 class StarLayer extends MaterialLayer {
 
   String get glslVertex => """
-//uniform float uMinY;
-//uniform float uMaxY;
-
 void main(void) {
 
 }
@@ -17,12 +14,6 @@ void main(void) {
   String get glslFragment => """
 uniform vec2      iResolution;           // viewport resolution (in pixels)
 uniform float     iGlobalTime;           // shader playback time (in seconds)
-//uniform float     iChannelTime[4];       // channel playback time (in seconds)
-//uniform vec3      iChannelResolution[4]; // channel resolution (in pixels)
-//uniform vec4      iMouse;                // mouse pixel coords. xy: current (if MLB down), zw: click
-//uniform samplerXX iChannel0..3;          // input channel. XX = 2D/Cube
-//uniform vec4      iDate;                 // (year, month, day, time in seconds)
-
 
 
 /**
@@ -135,9 +126,6 @@ void main(void)
     return {
       'iResolution': new Vector2(500.0, 500.0 ), // fixme
       'iGlobalTime': 1.0,
-//      'uAlpha': 1.0,
-//      'uMaxY': model.mesh.boundingBox.yMax,
-//      'uMinY': model.mesh.boundingBox.yMin,
     };
   }
 
@@ -147,9 +135,7 @@ void main(void)
     _t += 0.016;
     double _red = (sin(_t) + 1) / 2;
     return {
-//      'uTime': new Vector3(_red, 1.0-_red, 0.5),
       'iGlobalTime': _t,
-//      'uColor': new Vector3(_red, 1.0-_red, 0.5),
     };
   }
 

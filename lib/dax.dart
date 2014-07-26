@@ -44,6 +44,7 @@ part 'src/material/DefaultMaterial.dart';
 
 part 'src/mesh/StupidTriangleMesh.dart';
 part 'src/mesh/SquareMesh.dart';
+part 'src/mesh/QuadcubeMesh.dart';
 part 'src/mesh/QuadsphereMesh.dart';
 
 

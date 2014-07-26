@@ -26,6 +26,9 @@ class DemoGobanMaterial extends Material {
     layers.add(new WoodLayer());
 //    layers.add(new StarLayer());
 //    layers.add(new BitmapTextureLayer(new ImageElement(src: "texture/goban_lines.png")));
+//    layers.add(new BitmapTextureLayer(new ImageElement(src: "texture/quadsphere/cube_net.jpg")));
+    layers.add(new BitmapTextureLayer(new ImageElement(src: "texture/quadsphere/debug_example.png")));
+//    layers.add(new BitmapTextureLayer(new ImageElement(src: "texture/quadsphere/earth.jpg")));
   }
 }
 
@@ -96,7 +99,7 @@ class DemoSquareModel02 extends Model {
 }
 
 class DemoGobanModel extends Model {
-  Mesh _mesh = new QuadsphereMesh(complexity: 9, size: 10.0);
+  Mesh _mesh = new QuadsphereMesh(complexity: 9, size: 5.0, ySegments: 19);
   Mesh get mesh => _mesh;
   Material material = new DemoGobanMaterial();
   void update(num time, num delta) {
