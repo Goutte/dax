@@ -15,6 +15,9 @@ const int MAPPING_CUBIC_NET = 0x02;
  * - Homotilic : all tiles have the same UV mapping on the same texture.
  * - Cubic Net : like a christian cross laid on its left side.
  *
+ * About events :
+ * So that you may hook your coordinates system
+ *
  * By default, the [size] of a side of the quadcube has length 1. (unitary cube)
  */
 class QuadcubeMesh extends TrianglesMesh {
@@ -33,7 +36,7 @@ class QuadcubeMesh extends TrianglesMesh {
   int uvMapping;
 
   // This does not behave as I expected it to.
-  // I cannot use it in the default constructor parameter [uvMapping].
+  // I cannot use it as the default of constructor parameter [uvMapping].
 //  static final int MAPPING_HOMOTILIC = 0x01;
 //  static final int MAPPING_CUBIC_NET = 0x02;
 
@@ -70,6 +73,24 @@ class QuadcubeMesh extends TrianglesMesh {
     _buildCubeFace(new Vector3( 0.0, 0.0,-1.0), new Vector2(4/4, 2/3), new Vector2(3/4, 1/3), false); // -Z
   }
 
+  /// TO OVERRIDE --------------------------------------------------------------
+
+  /**
+   * Override this to hook your coordinates system on the quadfaces.
+   * Ideally this would be a Stream for us to subscribe on.
+   * It is provided the [index] of the first coordinate element of
+   * the first vertex (A) of the quadface.
+   * It is also provided a list of 3 integers that can act as coordinates
+   * suitable for lattice operations and analysis such as neighboring,
+   * pathfinding, pole recognition, etc.
+   * (these operations are not provided by dax, they are examples)
+   * (also, there should be other hooks, for coordinate systems on edges
+   * or vertices.
+   */
+  void onQuadFace(int index, List<int> systemCoords) {}
+
+  /// PRIVVIES -----------------------------------------------------------------
+
   List<double> _getUvs() {
     if (uvMapping & MAPPING_CUBIC_NET > 0) {
       return _uvs_cubic_net;
@@ -103,37 +124,37 @@ class QuadcubeMesh extends TrianglesMesh {
     _applyCyclicRotation(segments, offset);
     _applyCyclicRotation(sizes, offset);
 
-
     num iSize = sizes[0], jSize = sizes[1], kSize = sizes[2];
-    int jSegments = segments[1], kSegments = segments[2];
+    int iSegmts = segments[0], jSegmts = segments[1], kSegmts = segments[2];
 
-    // i is the face's constant
-    num i = faceAxis[offset] * iSize / 2;
+    // Data about integer system coordinates
+    int iSys = faceAxis[offset].toInt() * iSegmts;
+    int jSys, kSys;
 
-    num jStep = jSize / jSegments;
-    num kStep = kSize / kSegments;
+    // Data about vertices coordinates (affected by sizes)
+    num i = faceAxis[offset] * iSize / 2; // i is the face's constant
+    num jStep = jSize / jSegmts;
+    num kStep = kSize / kSegmts;
+    num juvMin = uvMin[0], juvMax = uvMax[0];
+    num kuvMin = uvMin[1], kuvMax = uvMax[1];
+    num jjuvStep = (juvMax - juvMin) / jSegmts;
+    num jkuvStep = (juvMax - juvMin) / kSegmts;
+    num kkuvStep = (kuvMax - kuvMin) / kSegmts;
+    num kjuvStep = (kuvMax - kuvMin) / jSegmts;
 
-
-    num juvMin, juvMax, kuvMin, kuvMax;
-    num jjuvStep, kkuvStep;
-    num jkuvStep, kjuvStep;
-    juvMin = uvMin[0];
-    juvMax = uvMax[0];
-    kuvMin = uvMin[1];
-    kuvMax = uvMax[1];
-    jjuvStep = (juvMax - juvMin) / jSegments;
-    jkuvStep = (juvMax - juvMin) / kSegments;
-    kkuvStep = (kuvMax - kuvMin) / kSegments;
-    kjuvStep = (kuvMax - kuvMin) / jSegments;
-
+    // The integer coordinates
+    List<int> sysCoords = new List<int>();
+    // The vertices
     Vector3 a = new Vector3.zero(), b = new Vector3.zero(),
             c = new Vector3.zero(), d = new Vector3.zero();
+    // Their respective UVs
     Vector2 auv = new Vector2.zero(), buv = new Vector2.zero(),
             cuv = new Vector2.zero(), duv = new Vector2.zero();
-    for (int j in range(0, jSegments)) {
-      for (int k in range(0, kSegments)) {
+    for (int j in range(0, jSegmts)) {
+      for (int k in range(0, kSegmts)) {
         /**
          * for each quadface (subface of the cube) aka rubik's cube tile :)
+         * I is towards your eye, and the rest looks like :
          *      K
          *      ↑
          *   D     C
@@ -142,6 +163,13 @@ class QuadcubeMesh extends TrianglesMesh {
          *    +---+
          *   A     B
          */
+        sysCoords.clear();
+        jSys = j * 2 - jSegmts + 1;
+        kSys = k * 2 - kSegmts + 1;
+        sysCoords.addAll([iSys, jSys, kSys]);
+//        sysCoords[0] = iSys; sysCoords[1] = jSys; sysCoords[2] = kSys;
+        _applyCyclicRotation(sysCoords, -offset);
+
         a.setValues(i, (j+0)*jStep - jSize/2, (k+0)*kStep - kSize/2);
         b.setValues(i, (j+1)*jStep - jSize/2, (k+0)*kStep - kSize/2);
         c.setValues(i, (j+1)*jStep - jSize/2, (k+1)*kStep - kSize/2);
@@ -152,21 +180,23 @@ class QuadcubeMesh extends TrianglesMesh {
         c.copyFromArray(_applyCyclicRotation(c.storage, -offset));
         d.copyFromArray(_applyCyclicRotation(d.storage, -offset));
 
-        auv.setValues(juvMin + (j+0)*jjuvStep, kuvMin + (k+0)*kkuvStep);
-        buv.setValues(juvMin + (j+1)*jjuvStep, kuvMin + (k+0)*kkuvStep);
-        cuv.setValues(juvMin + (j+1)*jjuvStep, kuvMin + (k+1)*kkuvStep);
-        duv.setValues(juvMin + (j+0)*jjuvStep, kuvMin + (k+1)*kkuvStep);
-
         if (inverse) { // when x/y of uv mapping does not match j/k
           auv.setValues(juvMin + (k+0)*jkuvStep, kuvMin + (j+0)*kjuvStep);
-          buv.setValues(juvMin + (k+1)*jkuvStep, kuvMin + (j+0)*kjuvStep);
+          buv.setValues(juvMin + (k+0)*jkuvStep, kuvMin + (j+1)*kjuvStep);
           cuv.setValues(juvMin + (k+1)*jkuvStep, kuvMin + (j+1)*kjuvStep);
-          duv.setValues(juvMin + (k+0)*jkuvStep, kuvMin + (j+1)*kjuvStep);
-          _buildQuadFace(a,b,c,d,auv,duv,cuv,buv);
+          duv.setValues(juvMin + (k+1)*jkuvStep, kuvMin + (j+0)*kjuvStep);
         } else {
-          _buildQuadFace(a,b,c,d,auv,buv,cuv,duv);
+          auv.setValues(juvMin + (j+0)*jjuvStep, kuvMin + (k+0)*kkuvStep);
+          buv.setValues(juvMin + (j+1)*jjuvStep, kuvMin + (k+0)*kkuvStep);
+          cuv.setValues(juvMin + (j+1)*jjuvStep, kuvMin + (k+1)*kkuvStep);
+          duv.setValues(juvMin + (j+0)*jjuvStep, kuvMin + (k+1)*kkuvStep);
         }
 
+        int quadFaceIndex = _vertices.length;
+
+        _buildQuadFace(a,b,c,d,auv,buv,cuv,duv);
+
+        onQuadFace(quadFaceIndex, sysCoords);
       }
     }
   }
