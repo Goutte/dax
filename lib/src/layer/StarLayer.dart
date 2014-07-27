@@ -3,6 +3,11 @@ part of dax;
 
 /**
  * Star based on https://www.shadertoy.com/view/4dXGR4
+ *
+ * Options :
+ *   - fireColor: the color of the flames
+ *   - glowColor is disabled atm.
+ *
  */
 class StarLayer extends MaterialLayer {
 
@@ -14,6 +19,9 @@ void main(void) {
   String get glslFragment => """
 uniform vec2      iResolution;           // viewport resolution (in pixels)
 uniform float     iGlobalTime;           // shader playback time (in seconds)
+
+uniform vec3  glowColor;
+uniform vec3  fireColor;
 
 
 /**
@@ -63,8 +71,6 @@ void main(void)
 	float radius		= 0.24 + brightness * 0.2;
 	float invRadius 	= 1.0/radius;
 
-	vec3 orange			= vec3( 0.8, 0.65, 0.3 );
-	vec3 orangeRed		= vec3( 0.8, 0.35, 0.1 );
 	float time		= iGlobalTime * 0.1;
 	float aspect	= iResolution.x/iResolution.y;
 	vec2 uv			= gl_FragCoord.xy / iResolution.xy;
@@ -115,15 +121,30 @@ void main(void)
 
 	float starGlow	= min( max( 1.0 - dist * ( 1.0 - brightness ), 0.0 ), 1.0 );
 
-	//gl_FragColor.rgb	= vec3( f * ( 0.75 + brightness * 0.3 ) * orange ) + starSphere + corona * orange + starGlow * orangeRed;
-	gl_FragColor.rgb	= vec3( f * ( 0.75 + brightness * 0.3 ) * orange ) + corona * orange + starGlow * orangeRed;
+	//gl_FragColor.rgb	= vec3( f * ( 0.75 + brightness * 0.3 ) * fireColor ) + starSphere + corona * fireColor + starGlow * glowColor;
+	gl_FragColor.rgb	= vec3( f * ( 0.75 + brightness * 0.3 ) * fireColor ) + corona * fireColor;
 	gl_FragColor.a		= 1.0;
 }
 
   """;
 
+  Vector3 glowColor;
+  Vector3 fireColor;
+  StarLayer({ Vector3 glowColor, Vector3 fireColor }) : super() {
+    if (glowColor == null) {
+      glowColor = new Vector3(0.8, 0.35, 0.1);
+    }
+    this.glowColor = glowColor;
+    if (fireColor == null) {
+      fireColor = new Vector3(0.8, 0.65, 0.3);
+    }
+    this.fireColor = fireColor;
+  }
+
   Map<String, dynamic> onSetup(World world, Model model, Renderer renderer) {
     return {
+      'glowColor': glowColor,
+      'fireColor': fireColor,
       'iResolution': new Vector2(500.0, 500.0 ), // fixme
       'iGlobalTime': 1.0,
     };

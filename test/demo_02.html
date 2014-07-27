@@ -3,8 +3,6 @@
   <head>
     <meta charset="utf-8">
     <title>Dax Demo #02</title>
-    <script type="application/dart" src="demo_02.dart"></script>
-    <!--<script type="application/javascript" src="demo_02.dart.js"></script>-->
     <style>
       body {
         width: 600px;
@@ -16,7 +14,7 @@
       canvas {
         border: 1px solid black;
         display: block;
-        margin: 0 auto;
+        margin: 0 auto 15px auto;
       }
       #stats {
         position: absolute;
@@ -32,7 +30,7 @@
       <a id="showStatsButton" href="?fps">Show Stats.</a>
     </p>
     <canvas id="demoCanvas" width="500" height="500"></canvas>
-    <p>
+    <div>
       This demo showcases usage of :
       <ul>
         <li>Custom texture <input id="texture_file" type="file"/></li>
@@ -41,10 +39,13 @@
         <li>Extending <code>Model.update()</code></li>
         <li>The material layer <code>BitmapTextureLayer</code></li>
       </ul>
-      <pre>
-        <code>
-        </code>
-      </pre>
-    </p>
+      <p>
+        The default quadsphere texture is :
+        <img src="texture/quadsphere/debug_example.png" alt=""/>
+      </p>
+    </div>
+
+    <script type="application/dart" src="demo_02.dart"></script>
+    <!--<script type="application/javascript" src="demo_02.dart.js"></script>-->
   </body>
 </html>

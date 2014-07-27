@@ -6,6 +6,7 @@ import 'dart:web_gl';
 
 import 'package:vector_math/vector_math.dart';
 import 'package:stats/stats.dart';
+import 'package:color/color.dart';
 
 import 'demo_utils.dart';
 import '../lib/dax.dart';
@@ -21,14 +22,7 @@ import '../lib/dax.dart';
 class DemoGobanMaterial extends Material {
   DemoGobanMaterial() : super() {
     layers.add(new PositionLayer());
-//    layers.add(new ColorLayer());
-    layers.add(new DidiLayer());
-    layers.add(new WoodLayer());
-//    layers.add(new StarLayer());
-//    layers.add(new BitmapTextureLayer(new ImageElement(src: "texture/goban_lines.png")));
-//    layers.add(new BitmapTextureLayer(new ImageElement(src: "texture/quadsphere/cube_net.jpg")));
-//    layers.add(new BitmapTextureLayer(new ImageElement(src: "texture/quadsphere/debug_example.png")));
-    layers.add(new BitmapTextureLayer(new ImageElement(src: "texture/quadsphere/earth.jpg")));
+    layers.add(new BitmapTextureLayer(new ImageElement(src: "texture/quadsphere/debug_example.png")));
   }
 }
 
@@ -41,7 +35,6 @@ class Demo02Material01 extends Material {
     layers.add(new PositionLayer());
     layers.add(new ColorLayer());
     layers.add(new StarLayer());
-//    layers.add(new BitmapTextureLayer(new ImageElement(src: "texture/brain.png")));
   }
 }
 
@@ -59,7 +52,10 @@ class Demo02Material02 extends Material {
   Demo02Material02() : super() {
     layers.add(new PositionLayer());
     layers.add(new ColorLayer());
-    layers.add(new BitmapTextureLayer.src("texture/background_and_color.png"));
+    layers.add(new StarLayer(
+        glowColor: new Vector3(0.1, 0.35, 0.8),
+        fireColor: new Vector3(0.3, 0.65, 0.8)
+    ));
   }
 }
 
@@ -67,7 +63,7 @@ class Demo02Material02 extends Material {
  * A model of a quadspherical goban
  */
 class DemoGobanModel extends Model {
-  Mesh _mesh = new QuadsphereMesh(complexity: 9, size: 5.0, ySegments: 19);
+  Mesh _mesh = new QuadsphereMesh(complexity: 9, size: 1.0, ySegments: 19);
   Mesh get mesh => _mesh;
   Material material = new DemoGobanMaterial();
   void update(num time, num delta) {
@@ -137,6 +133,8 @@ main() {
 
   Demo02 demo = new Demo02(canvas, stats);
 
+  demo.world.camera.setPosition(new Vector3(0.0,0.0,2.2666));
+
   demo.gl.enable(DEPTH_TEST);
   demo.gl.blendFunc(SRC_ALPHA, ONE_MINUS_SRC_ALPHA);
   demo.gl.enable(BLEND);
@@ -144,12 +142,10 @@ main() {
   demo.start();
 
 
-  /// Some code to change the texture of the quadsphere on-the-fly
+  /// Allow change of the texture of the quadsphere on-the-fly.
   querySelector("#texture_file").onChange.listen((e){
     File file = e.currentTarget.files[0];
-
     print("Changed texture file to ${file.name}");
-
     ImageElement tex = new ImageElement();
     FileReader reader = new FileReader();
     reader.onLoad.listen((e) {
@@ -157,7 +153,6 @@ main() {
       demo.goban.material.setVariable('BitmapTextureLayer', 'uTexture', new BitmapTexture(tex));
     });
     reader.readAsDataUrl(file);
-
   });
 
 

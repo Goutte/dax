@@ -4,6 +4,7 @@ description: Experimental framework for developing WebGL-enabled applications.
 environment:
   sdk: '>=0.8.10+6 <2.0.0'
 dependencies:
+#  browser: any  # pretty sure we do not need this anymore, investigate
 #  vector_math: '>=1.4.2+1 <2.0.0'
   vector_math:
       git: https://github.com/Goutte/vector_math

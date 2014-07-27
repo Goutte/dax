@@ -214,7 +214,7 @@ class QuadcubeMesh extends TrianglesMesh {
   List _applyCyclicRotation(List tuple, int offset) {
     int n = tuple.length;
     offset = ((offset % n) + n) % n;
-    int tmp;
+    num tmp;
     while (offset-- > 0) {
       tmp = tuple[0];
       for (int i in range(0, n-1)) {
