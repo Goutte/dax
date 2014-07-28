@@ -64,22 +64,11 @@ abstract class Controller extends GameLoopHtml {
   }
 
 
-  Vector3 _mouse_moved_camera_position = new Vector3(0.0,0.0,0.0);
-  /// DEFAULTS : there should not be defaults here, but in mixins !
-  /// this is only a draft
-  mouse_moved(Mouse mouse) {
-
-//    _mouse_moved_camera_position = world.camera.position;
-
-    num strenght = 100;
-//    _mouse_moved_camera_position.z = mouse.y.toDouble() / strenght;
-//    _mouse_moved_camera_position.x = mouse.x.toDouble() / strenght;
-
-//    print("New camera position: $_mouse_moved_camera_position");
-
-//    world.camera.setPosition(_mouse_moved_camera_position);
-
-  }
+  /**
+   * Override this.
+   * It is called on each move of the [mouse].
+   */
+  mouse_moved(Mouse mouse) {}
 
 
 
