@@ -10,14 +10,8 @@ part of dax;
  * Y
  * + X
  * (Z is towards you, as per right-hand convention)
- *
- * You should never try to assign values to the attributes of the Camera.
- * (This limitation could be removed with an Advisor pattern)
- * Instead, use the methods, as they update the internal cache.
  */
 class Camera extends SpatialSceneNode {
-
-//  Vector3 _focus;
 
   /// Memoization holders
 
@@ -38,7 +32,7 @@ class Camera extends SpatialSceneNode {
   /// GETTERS ------------------------------------------------------------------
 
   /// The spatial and cartesian (x,y,z) position of the [focus] of the camera.
-//  Vector3 get focus => _focus;
+  Vector3 get focus => position + direction;
 
   num get aspect => width / height;
 
@@ -51,18 +45,8 @@ class Camera extends SpatialSceneNode {
     if (position == null) position = new Vector3(0.0, 0.0, 10.0);
     if (focus == null) focus = new Vector3(0.0, 0.0, 0.0);
     if (up == null) up = new Vector3(0.0, 1.0, 0.0);
-//    this._position = position;
-//    this._focus = focus;
-//    this._up = up;
 
-    // fixme:
     lookAt(position, focus, up);
-
-//    print("looked at");
-//    assert(this.position.z == -10.0);
-    print("looked in ${this.direction} !");
-
-//    this._stale |= FL
 
     _pMatrix = makePerspectiveMatrix(fov, aspect, near, far);
     _vMatrix = makeViewMatrix(position, focus, up);
@@ -84,7 +68,7 @@ class Camera extends SpatialSceneNode {
 
   Matrix4 _getViewMatrix() {
     if (_vMatrixStale || true) {
-      setViewMatrix(_vMatrix, position, position + direction, up);
+      setViewMatrix(_vMatrix, position, focus, up);
       _vMatrixStale = false;
     }
     return _vMatrix;

@@ -13,13 +13,18 @@ class World extends SceneGraph {
   Color background;
   Camera camera;
 
-  World({ Color background }) : super() {
+  World({ Color background, Camera camera }) : super() {
     if (background == null) {
       background = new Color.rgb(1,1,1);
     }
     this.background = background;
 
-    this.camera = new Camera();
+    if (camera == null) {
+      camera = new Camera();
+    }
+    this.camera = camera;
+
+    this.root.add(camera);
   }
 
   /// API ----------------------------------------------------------------------
@@ -27,23 +32,24 @@ class World extends SceneGraph {
   /**
    * Traverses the nodes of this world, and calls the update() of Models.
    * The traversal is parent-first. (i still don't know what i'm doing)
+   * Both [time] and [delta] should be in seconds. (to verify)
    */
   void update(num time, num delta) {
-    _updateNode(root, time, delta);
+    _updateNodeAndChildren(root, time, delta);
   }
 
   /// PRIVVIES -----------------------------------------------------------------
 
-  void _updateNode(SceneNode node, num time, num delta) {
-    if (node is Model) {
-      _updateModel(node, time, delta);
+  void _updateNodeAndChildren(SceneNode node, num time, num delta) {
+    if (node is Updatable) {
+      _updateUpdatable(node, time, delta);
     }
     for (SceneNode child in node.children) {
-      _updateNode(child, time, delta);
+      _updateNodeAndChildren(child, time, delta);
     }
   }
 
-  void _updateModel(Model model, num time, num delta) {
+  void _updateUpdatable(Updatable model, num time, num delta) {
     model.update(time, delta);
   }
 

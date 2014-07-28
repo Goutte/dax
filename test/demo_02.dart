@@ -106,14 +106,32 @@ class DemoSquareModel02 extends Model {
 
 /**
  * We define our Demo Controller that will set up the world's models.
+ * This Controller is an example of usage of the TrackballCamera.
  */
 class Demo02 extends Controller {
   Model goban;
-  Demo02(CanvasElement canvas, Stats stats) : super(canvas, stats: stats) {
+  Demo02(CanvasElement canvas, Stats stats) :
+    super(canvas, stats: stats, camera: new TrackballCamera()) {
     goban = new DemoGobanModel();
     world.add(goban);
     world.add(new DemoSquareModel());
     world.add(new DemoSquareModel02());
+  }
+
+
+  num drag_strength = 1/777;
+  mouse_dragged(Mouse mouse) {
+    TrackballCamera camera = world.camera;
+    num dx = mouse.dx * drag_strength * -1;
+    num dy = mouse.dy * drag_strength; // oddity
+    camera.trackball(dx, dy, 0.0);
+  }
+
+  num wheel_strength = 1/5555;
+  mouse_wheeled(Mouse mouse) {
+    TrackballCamera camera = world.camera;
+    num dz = mouse.wheelDy.toDouble() * wheel_strength * 1;
+    camera.trackball(0.0,0.0,dz);
   }
 }
 
@@ -157,8 +175,9 @@ main() {
   });
 
 
-  // Oddly enough, drag'n drop of external files does not work on my machine
+  // HTML5's drag'n drop of external files does not work on my machine.
   // Even gmail's does not.
+  // Also, the weirdness about the mandatory stopPropagation() is unsettling.
 //  canvas.onDrop.listen((e){
 //    print('dropped $e');
 //  });
@@ -183,7 +202,5 @@ main() {
 //    e.preventDefault();
 //    print('drag leave $e');
 //  });
-
-
 
 }

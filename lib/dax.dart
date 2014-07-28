@@ -12,6 +12,9 @@ import 'package:stats/stats.dart';
 import 'package:game_loop/game_loop_html.dart';
 import "package:range/range.dart";
 
+
+part 'src/camera/TrackballCamera.dart';
+
 part 'src/core/Camera.dart';
 part 'src/core/Controller.dart';
 part 'src/core/GlslVocabulary.dart';
@@ -19,7 +22,7 @@ part 'src/core/Material.dart';
 part 'src/core/MaterialLayer.dart';
 part 'src/core/Mesh.dart';
 part 'src/core/Model.dart';
-part 'src/core/Renderable.dart';
+part 'src/core/Interfaces.dart';
 part 'src/core/Renderer.dart';
 part 'src/core/SceneGraph.dart';
 part 'src/core/SceneNode.dart';
@@ -73,7 +76,7 @@ const double O = 6.2831853071795865;
 List rotateCycle(List tuple, int offset) {
   int n = tuple.length;
   offset = ((offset % n) + n) % n;
-  int tmp;
+  num tmp;
   while (offset-- > 0) {
     tmp = tuple[0];
     for (int i in range(0, n-1)) {

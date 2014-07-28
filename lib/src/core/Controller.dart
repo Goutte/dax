@@ -7,10 +7,13 @@ part of dax;
  * - sets up a World for you to use
  * - fetches WebGL's RenderingContext with default parameters, unless you provide one.
  * - controls the rendering and updating flows
+ * - provide input hooks :
+ *   - mouse_moved
+ *   - mouse_dragged
+ *   - mouse_wheeled
  *
  * The (optional) Stats measure the cumulated rendering AND updating.
  */
-num _time = 0; // fixme: remove the need for this hack
 abstract class Controller extends GameLoopHtml {
 
   WebGLRenderer renderer;
@@ -27,14 +30,16 @@ abstract class Controller extends GameLoopHtml {
   WebGL.RenderingContext _gl;
 //  bool _isRendering = false;
 //  bool _isUpdating = false;
-//  num _time = 0;
 
   Controller(CanvasElement canvas, {
       Stats this.stats,
-      WebGL.RenderingContext gl
+      WebGL.RenderingContext gl,
+      Camera camera
   }) : super(canvas) {
+
     // Set up a world for the user to populate
-    world = new World();
+    world = new World(camera: camera);
+
     // Get the WebGL RenderingContext from the CanvasElement
     if (gl == null) {
       gl = canvas.getContext3d(
@@ -49,20 +54,27 @@ abstract class Controller extends GameLoopHtml {
       );
     }
     this._gl = gl;
+
     // Set up the WebGL renderer
     renderer = new WebGLRenderer(this._gl);
 
+    // Make sure that the pointer lock on click is disabled
     pointerLock.lockOnClick = false;
 
-//    _time = time;
-
+    // Hook game_loop GameLoopHtml streams
     onRender = onDefaultRender;
     onUpdate = onDefaultUpdate;
-
-
-
   }
 
+
+  /// API ----------------------------------------------------------------------
+
+  /**
+   * Override this.
+   * It is called on each update, with the [time] since the beginning and the
+   * [delta] since last update, both in seconds. (eventually, they may well not yet be)
+   */
+  update(num time, num delta) {}
 
   /**
    * Override this.
@@ -70,80 +82,31 @@ abstract class Controller extends GameLoopHtml {
    */
   mouse_moved(Mouse mouse) {}
 
-
-
-  Vector3 _mouse_wheeled_camera_position = new Vector3(0.0,0.0,0.0);
-  /// DEFAULTS : there should not be defaults here, but in mixins !
-  /// this is only a draft
-  mouse_wheeled(Mouse mouse) {
-    num minDistance = 0.0;
-    num maxDistance = 42.0;
-
-    _mouse_wheeled_camera_position.setFrom(world.camera.position);
-
-    num strenght = -1/400;
-    _mouse_wheeled_camera_position.add(world.camera.direction * mouse.wheelDy.toDouble() * strenght);
-    _mouse_wheeled_camera_position = constrainInCoconut(_mouse_wheeled_camera_position, new Vector3.zero(), minDistance, maxDistance);
-    world.camera.setPosition(_mouse_wheeled_camera_position);
-  }
-
-
-  Vector3 _mouse_dragged_camera_position = new Vector3(0.0,0.0,0.0);
-  /// DEFAULTS : there should not be defaults here, but in mixins !
-  /// this is only a draft
-  mouse_dragged(Mouse mouse) {
-
-    num strenght = 1/200;
-
-    Camera camera = world.camera;
-    num dx = mouse.dx * strenght * -1;
-    num dy = mouse.dy * strenght *  1;
-
-    // todo: optimize
-    Quaternion _cameraQuatUp = new Quaternion.identity();
-    Quaternion _cameraQuatRi = new Quaternion.identity();
-    Quaternion _cameraQuat   = new Quaternion.identity();
-    Vector3 _cameraDirection = new Vector3.zero();
-
-    _cameraQuatUp.setAxisAngle(camera.up,    -1 * dx);
-    _cameraQuatRi.setAxisAngle(camera.right,  1 * dy);
-    _cameraQuat = _cameraQuatUp.multiplyInto(_cameraQuatRi, _cameraQuat);
-
-
-    Vector3 oldDirection = camera.direction.clone();
-    _cameraDirection = _cameraQuat.rotated(oldDirection);
-    camera.setDirection(_cameraDirection, camera.up);
-
-    camera.setPosition(_cameraQuat.rotated(camera.position));
-
-  }
-
-
-
-
-
-
-
-
-
-
-
-
+  /**
+   * Override this.
+   * It is called on each vertical [mouse] wheel.
+   */
+  mouse_wheeled(Mouse mouse) {}
 
 
   /**
-   * Where would the [satellite] be in the [coconut] between the [min] sphere and the [max] sphere.
-   * C'est pas la bulle qui grossit c'est le monde qui se rapproche.
+   * Override this.
+   * It is called on each drag of the [mouse].
    */
-  Vector3 constrainInCoconut(Vector3 satellite, Vector3 coconut, num min, num max) {
-    Vector3 diff = satellite - coconut;
-    if (diff.length2 < min * min) {
-      diff.normalize().scale(min);
-    } else if (diff.length2 > max * max) {
-      diff.normalize().scale(max);
-    }
-    return coconut + diff;
-  }
+  mouse_dragged(Mouse mouse) {}
+
+
+
+
+
+
+
+
+
+
+  /// HOOKS FOR GAME_LOOP ------------------------------------------------------
+
+  // This lot may well go away when we either fork game_loop and patch it, or roll our own.
 
   void onDefaultRender(GameLoopHtml self) {
     if (stats != null) { stats.begin(); }
@@ -154,7 +117,7 @@ abstract class Controller extends GameLoopHtml {
 
   bool _isDragging = false;
   void onDefaultUpdate (GameLoopHtml self) {
-//    num delta = time - _time;
+
 //    print("update $time / $dt");
     world.update(time, dt);
     update(time, dt);
@@ -177,6 +140,6 @@ abstract class Controller extends GameLoopHtml {
     }
   }
 
-  void update(num time, num delta){}
+
 
 }

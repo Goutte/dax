@@ -15,7 +15,7 @@ part of dax;
  *
  * A Model automatically has the default material DefaultMaterial.
  */
-abstract class Model extends SpatialSceneNode implements Renderable, Shadable {
+abstract class Model extends SpatialSceneNode implements Positionable, Shadable, Updatable {
 
   Material _material = new DefaultMaterial();
   Material get material => _material;
@@ -23,7 +23,7 @@ abstract class Model extends SpatialSceneNode implements Renderable, Shadable {
   /// To override with your own logic.
   /// The [time] since the first render is available, as well as
   /// the [deltaTime] since the last render.
-  /// They're both in milliseconds (i think).
-  void update(num time, num deltaTime){}
+  /// They're both in milliseconds (i think). They should be in seconds.
+  void update(num time, num delta){}
 
 }

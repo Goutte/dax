@@ -3,6 +3,7 @@ part of dax;
 
 /**
  * Didi's joy
+ * This is a blackboard for testing/explaining a rainbow shader to a friend.
  */
 class DidiLayer extends MaterialLayer {
 
@@ -63,10 +64,9 @@ void main(void) {
   double _t = 0.0;
 
   Map<String, dynamic> onDraw(World world, Model model, Renderer renderer) {
-    _t += 0.02;
+    _t += 0.016;
     double _red = (sin(_t) + 1) / 2;
     return {
-//      'uTime': new Vector3(_red, 1.0-_red, 0.5),
       'uColor': new Vector3(_red, 1.0-_red, 0.5),
     };
   }

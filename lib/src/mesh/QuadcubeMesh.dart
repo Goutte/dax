@@ -85,7 +85,7 @@ class QuadcubeMesh extends TrianglesMesh {
    * pathfinding, pole recognition, etc.
    * (these operations are not provided by dax, they are examples)
    * (also, there should be other hooks, for coordinate systems on edges
-   * or vertices.
+   * or vertices.)
    */
   void onQuadFace(int index, List<int> systemCoords) {}
 
