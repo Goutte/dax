@@ -1,9 +1,21 @@
 
-0.2.0 -- WiP
+0.3.0 -- ???
 ------------
+
+- ???
+
+
+
+0.2.0 -- 2014-07-29
+-------------------
 
 - Application
 - Controller
+- Dumb Shader Preprocessor
+- Smooth Trackball Camera
+- Quadcube mesh and UVs
+- Quadsphere mesh and UVs
+- Demo #02
 
 
 0.1.0 -- 2014-07-14
@@ -15,4 +27,4 @@
 - Mesh
 - Material
 - WebGLRenderer
-- enough to draw demo #01
+- Demo #01
