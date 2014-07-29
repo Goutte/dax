@@ -142,11 +142,15 @@ abstract class Controller extends GameLoopHtml with EventEmitter {
       _dxSinceDown = 0.0;
       _dySinceDown = 0.0;
     }
+    if (mouse.isDown(Mouse.LEFT)) {
+      _dxSinceDown += dx.abs();
+      _dySinceDown += dy.abs();
+    }
     if (mouse.released(Mouse.LEFT)) {
       _isClicking = true;
 
-      if (_dxSinceDown.abs() < _mouseClickTolerance ||
-          _dySinceDown.abs() < _mouseClickTolerance) {
+      if (_dxSinceDown < _mouseClickTolerance ||
+          _dySinceDown < _mouseClickTolerance) {
         mouse_clicked(mouse, Mouse.LEFT);
       }
     }
