@@ -215,7 +215,7 @@ void main(void) {
 
   Map<String, dynamic> onSetup(World world, Model model, Renderer renderer) {
     return {
-      'LightWood':  new Vector3(0.42, 0.3, 0.1),
+      'LightWood':  new Vector3(0.40, 0.3, 0.1),
       'DarkWood':   new Vector3(0.3, 0.2, 0.07),
       'RingFreq':    0.25,
       'LightGrains': 1.0,
@@ -227,12 +227,16 @@ void main(void) {
     };
   }
 
-//  double _red_t = 0.0;
+  double _red_t = 0.0;
 
   Map<String, dynamic> onDraw(World world, Model model, Renderer renderer) {
-//    _red_t += 0.02;
-//    double _red = (sin(_red_t) + 1) / 2;
+    _red_t += 0.02;
+    double _red = (sin(_red_t) + 1) / 2;
     return {
+//      'RingFreq': 0.10 + (sin(_red_t/2) + 1) / 2,
+//      'LightGrains': (sin(_red_t/5) + 1) / 2,
+//      'DarkGrains': (sin(_red_t/3) + 1) / 2,
+//      'Noisiness': 1.80 + sin(_red_t/3)/4,
 //      'uColor': new Vector3(_red, 1.0-_red, 0.5),
     };
   }
