@@ -1,5 +1,8 @@
 part of dax;
 
+
+typedef OnQuadFace(int index, List<int> systemCoords);
+
 const int MAPPING_HOMOTILIC = 0x01;
 const int MAPPING_CUBIC_NET = 0x02;
 
@@ -35,6 +38,21 @@ class QuadcubeMesh extends TrianglesMesh {
 
   int uvMapping;
 
+  /**
+   * Define this to hook your coordinates system on the quadfaces.
+   * Ideally this would be a Stream for us to subscribe on, but as this is
+   * called during initialisation, when we'll listen we'll be too late.
+   * It is provided the [index] of the first coordinate element of
+   * the first vertex (A) of the quadface.
+   * It is also provided a list of 3 integers that can act as coordinates
+   * suitable for lattice operations and analysis such as neighboring,
+   * pathfinding, pole recognition, etc.
+   * (these operations are not provided by dax, they are examples)
+   * (also, there should be other hooks, for coordinate systems on edges
+   * or vertices.)
+   */
+  OnQuadFace onQuadFace;
+
   // This does not behave as I expected it to.
   // I cannot use it as the default of constructor parameter [uvMapping].
 //  static final int MAPPING_HOMOTILIC = 0x01;
@@ -49,10 +67,9 @@ class QuadcubeMesh extends TrianglesMesh {
       int xSegments,
       int ySegments,
       int zSegments,
-      int uvMapping: MAPPING_CUBIC_NET
+      int        this.uvMapping: MAPPING_CUBIC_NET,
+      OnQuadFace this.onQuadFace
   }) {
-
-    this.uvMapping = uvMapping;
 
     if (xSize == null) xSize = size;
     if (ySize == null) ySize = size;
@@ -72,22 +89,6 @@ class QuadcubeMesh extends TrianglesMesh {
     _buildCubeFace(new Vector3( 0.0, 0.0, 1.0), new Vector2(1/4, 2/3), new Vector2(2/4, 1/3), false); // +Z
     _buildCubeFace(new Vector3( 0.0, 0.0,-1.0), new Vector2(4/4, 2/3), new Vector2(3/4, 1/3), false); // -Z
   }
-
-  /// TO OVERRIDE --------------------------------------------------------------
-
-  /**
-   * Override this to hook your coordinates system on the quadfaces.
-   * Ideally this would be a Stream for us to subscribe on.
-   * It is provided the [index] of the first coordinate element of
-   * the first vertex (A) of the quadface.
-   * It is also provided a list of 3 integers that can act as coordinates
-   * suitable for lattice operations and analysis such as neighboring,
-   * pathfinding, pole recognition, etc.
-   * (these operations are not provided by dax, they are examples)
-   * (also, there should be other hooks, for coordinate systems on edges
-   * or vertices.)
-   */
-  void onQuadFace(int index, List<int> systemCoords) {}
 
   /// PRIVVIES -----------------------------------------------------------------
 
@@ -196,7 +197,9 @@ class QuadcubeMesh extends TrianglesMesh {
 
         _buildQuadFace(a,b,c,d,auv,buv,cuv,duv);
 
-        onQuadFace(quadFaceIndex, sysCoords);
+        if (onQuadFace != null) {
+          onQuadFace(quadFaceIndex, sysCoords);
+        }
       }
     }
   }
