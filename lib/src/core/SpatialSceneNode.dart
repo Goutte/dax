@@ -144,6 +144,8 @@ class SpatialSceneNode extends SceneNode {
 
       _direction.setFrom(_norm);
       _doNotRecalculate(FLAG_DIRECTION);
+
+      // fixme: don't we need to recalculate up and right too ?
     }
 
 

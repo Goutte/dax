@@ -45,7 +45,7 @@ main() {
   });
 
 
-  test('can rotate in local space', () {
+  test('rotate() in local space', () {
     SpatialSceneNode node = new SpatialSceneNode();
 
     node.rotate(O/2, new Vector3(0.0,1.0,0.0));
@@ -60,6 +60,39 @@ main() {
 
     expect(node.direction, ishVector3(1.0,0.0,0.0));
   });
+
+
+  test('setPosition() in world space', () {
+    SpatialSceneNode node = new SpatialSceneNode();
+
+    node.setPosition(new Vector3(1.0,2.0,3.0));
+
+    // unchanged
+    expect(node.up, isVector3(0.0,1.0,0.0));
+    expect(node.direction, ishVector3(0.0,0.0,-1.0));
+    // changed
+    expect(node.position, isVector3(1.0,2.0,3.0));
+  });
+
+
+  test('setDirection() in world space', () {
+    SpatialSceneNode node = new SpatialSceneNode();
+
+    // Without up
+    node.setDirection(new Vector3(1.0,0.0,0.0));
+
+    expect(node.up, isVector3(0.0,1.0,0.0));
+    expect(node.position, isVector3(0.0,0.0,0.0));
+    expect(node.direction, isVector3(1.0,0.0,0.0));
+
+    // With orthogonal up
+    node.setDirection(new Vector3(0.0,1.0,0.0), new Vector3(0.0,0.0,1.0));
+
+    expect(node.direction, isVector3(0.0,1.0,0.0));
+    expect(node.up, isVector3(0.0,0.0,1.0));
+    expect(node.right, isVector3(1.0,0.0,0.0));
+  });
+
 
 
   /**

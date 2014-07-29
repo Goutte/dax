@@ -6,7 +6,7 @@ import '../../lib/dax.dart';
 
 
 /**
- * Showcases the features of dax's glsl parser when making shaders layers
+ * Showcases the features of dax's glsl parser when merging shaders layers
  * for our materials.
  *
  * Supports :
@@ -21,6 +21,7 @@ import '../../lib/dax.dart';
  * - shared varying
  * Todo support :
  * - include
+ * - shared function ?
  */
 
 
