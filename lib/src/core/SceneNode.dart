@@ -7,6 +7,10 @@ part of dax;
  * Without any of these traits, a scene node is basically a convenience group
  * for sorting and recursive removal.
  *
+ * Right now, children of a Positionable scene node do not have a relative
+ * coordinates system to their parent, but i'd like them to in the future.
+ * That would mean multiplying some more matrices and memoize them too.
+ *
  * Attributes [parent] and [children] are read-only. Use the methods instead.
  *
  * See http://en.wikipedia.org/wiki/Scene_graph
@@ -22,6 +26,16 @@ class SceneNode {
   void add(SceneNode child) {
     children.add(child);
     child.parent = this;
+  }
+
+  /**
+   * Removes all children of this node.
+   */
+  void removeChildren() {
+    for (SceneNode child in children) {
+      child.parent = null;
+    }
+    children.clear();
   }
 
 }

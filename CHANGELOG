@@ -2,7 +2,7 @@
 0.3.0 -- ???
 ------------
 
-- ???
+- Add copy of EventEmitter (from https://github.com/julien/dart_mv/blob/master/lib/eventemitter.dart)
 
 
 
