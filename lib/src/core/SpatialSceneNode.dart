@@ -57,7 +57,7 @@ class SpatialSceneNode extends SceneNode {
   /// debug
   int get stale => _stale;
 
-  /// The spatial and cartesian (x,y,z) [position] of this node.
+  /// The spatial and cartesian (x,y,z) [position] of this node, in world space.
   Vector3 get position => _getPosition();
   /// A (normalized) cartesian vector in world space, looking [right].
   Vector3 get right => _getRight();
@@ -144,8 +144,6 @@ class SpatialSceneNode extends SceneNode {
 
       _direction.setFrom(_norm);
       _doNotRecalculate(FLAG_DIRECTION);
-
-      // fixme: don't we need to recalculate up and right too ?
     }
 
 

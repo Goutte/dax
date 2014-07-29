@@ -14,7 +14,7 @@ part of dax;
  *
  * The (optional) Stats measure the cumulated rendering AND updating.
  */
-abstract class Controller extends GameLoopHtml {
+abstract class Controller extends GameLoopHtml with EventEmitter {
 
   WebGLRenderer renderer;
   World world;

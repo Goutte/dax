@@ -1,5 +1,6 @@
 library dax;
 
+import 'dart:async';
 import 'dart:math';
 import 'dart:html';
 import 'dart:collection';
@@ -19,6 +20,7 @@ part 'src/controller/TrackballController.dart';
 
 part 'src/core/Camera.dart';
 part 'src/core/Controller.dart';
+part 'src/core/EventEmitter.dart';
 part 'src/core/GlslVocabulary.dart';
 part 'src/core/Material.dart';
 part 'src/core/MaterialLayer.dart';
