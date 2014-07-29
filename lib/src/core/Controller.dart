@@ -122,6 +122,7 @@ abstract class Controller extends GameLoopHtml with EventEmitter {
     if (stats != null) { stats.end(); }
   }
 
+  num _mouseClickTolerance = 0.0001;
   bool _isDragging = false;
   bool _isClicking = false;
   num _dxSinceDown = 0.0;
@@ -143,7 +144,7 @@ abstract class Controller extends GameLoopHtml with EventEmitter {
     }
     if (mouse.released(Mouse.LEFT)) {
       _isClicking = true;
-      num _mouseClickTolerance = 0.01;
+
       if (_dxSinceDown.abs() < _mouseClickTolerance ||
           _dySinceDown.abs() < _mouseClickTolerance) {
         mouse_clicked(mouse, Mouse.LEFT);
