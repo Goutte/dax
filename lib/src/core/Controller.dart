@@ -78,6 +78,13 @@ abstract class Controller extends GameLoopHtml with EventEmitter {
 
   /**
    * Override this.
+   * It is called on each [mouse] click of [buttonId].
+   * [buttonId] can be Mouse.LEFT, Mouse.RIGHT or MOUSE.MIDDLE.
+   */
+  mouse_clicked(Mouse mouse, int buttonId) {}
+
+  /**
+   * Override this.
    * It is called on each move of the [mouse].
    */
   mouse_moved(Mouse mouse) {}
@@ -116,6 +123,9 @@ abstract class Controller extends GameLoopHtml with EventEmitter {
   }
 
   bool _isDragging = false;
+  bool _isClicking = false;
+  num _dxSinceDown = 0.0;
+  num _dySinceDown = 0.0;
   void onDefaultUpdate (GameLoopHtml self) {
 
 //    print("update $time / $dt");
@@ -125,8 +135,24 @@ abstract class Controller extends GameLoopHtml with EventEmitter {
     num dx = mouse.dx;
     num dy = mouse.dy;
 
-    if (dx != 0 || dy != 0) {
-      if (mouse.isDown(0)) {
+    // LEFT CLICK
+    if (mouse.pressed(Mouse.LEFT)) {
+      _isClicking = true;
+      _dxSinceDown = 0.0;
+      _dySinceDown = 0.0;
+    }
+    if (mouse.released(Mouse.LEFT)) {
+      _isClicking = true;
+      num _mouseClickTolerance = 0.01;
+      if (_dxSinceDown.abs() < _mouseClickTolerance ||
+          _dySinceDown.abs() < _mouseClickTolerance) {
+        mouse_clicked(mouse, Mouse.LEFT);
+      }
+    }
+
+    // MOVE AND DRAG
+    if (mouse.dx != 0 || mouse.dy != 0) {
+      if (mouse.isDown(Mouse.LEFT)) {
         mouse_dragged(mouse);
       }
       else {
@@ -134,8 +160,8 @@ abstract class Controller extends GameLoopHtml with EventEmitter {
       }
     }
 
-    // WHEEL
-    if (mouse.wheelDx != 0 || mouse.wheelDy != 0) {
+    // VERTICAL WHEEL
+    if (mouse.wheelDy != 0) {
       mouse_wheeled(mouse);
     }
   }
