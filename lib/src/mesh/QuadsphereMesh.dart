@@ -30,10 +30,12 @@ class QuadsphereMesh extends QuadcubeMesh {
       num zSize,
       int xSegments,
       int ySegments,
-      int zSegments
+      int zSegments,
+      OnQuadFace onQuadFace
   }) : super(size: size, segments: complexity,
              xSize: xSize, ySize: ySize, zSize: zSize,
-             xSegments: xSegments, ySegments: ySegments, zSegments: zSegments) {
+             xSegments: xSegments, ySegments: ySegments, zSegments: zSegments,
+             onQuadFace: onQuadFace) {
     num xSize = allSizes[0], ySize = allSizes[1], zSize = allSizes[2];
     // Project parent's vertices on circumscribed sphere
     List<double> originalVertices = new List<double>.from(_vertices);
