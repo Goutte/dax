@@ -1,7 +1,7 @@
 name: dax
 author: Goutte <antoine@goutenoir.com>
 description: Experimental framework for developing WebGL-enabled applications.
-version: 0.2.0
+version: 0.2.1
 environment:
   sdk: '>=0.8.10+6 <2.0.0'
 dependencies:
