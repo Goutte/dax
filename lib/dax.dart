@@ -15,6 +15,8 @@ import "package:range/range.dart";
 
 part 'src/camera/TrackballCamera.dart';
 
+part 'src/controller/TrackballController.dart';
+
 part 'src/core/Camera.dart';
 part 'src/core/Controller.dart';
 part 'src/core/GlslVocabulary.dart';
