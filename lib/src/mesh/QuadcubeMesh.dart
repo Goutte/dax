@@ -168,7 +168,6 @@ class QuadcubeMesh extends TrianglesMesh {
         jSys = j * 2 - jSegmts + 1;
         kSys = k * 2 - kSegmts + 1;
         sysCoords.addAll([iSys, jSys, kSys]);
-//        sysCoords[0] = iSys; sysCoords[1] = jSys; sysCoords[2] = kSys;
         _applyCyclicRotation(sysCoords, -offset);
 
         a.setValues(i, (j+0)*jStep - jSize/2, (k+0)*kStep - kSize/2);
@@ -193,12 +192,15 @@ class QuadcubeMesh extends TrianglesMesh {
           duv.setValues(juvMin + (j+0)*jjuvStep, kuvMin + (k+1)*kkuvStep);
         }
 
-        int quadFaceIndex = _vertices.length;
-
-        _buildQuadFace(a,b,c,d,auv,buv,cuv,duv);
+        // Ensure ClockWise drawing when seen from the outside
+        if (i > 0) {
+          _buildQuadFace(a,b,c,d,auv,buv,cuv,duv);
+        } else {
+          _buildQuadFace(a,d,c,b,auv,duv,cuv,buv);
+        }
 
         if (onQuadFace != null) {
-          onQuadFace(quadFaceIndex, sysCoords);
+          onQuadFace(_vertices.length, sysCoords);
         }
       }
     }
@@ -215,7 +217,7 @@ class QuadcubeMesh extends TrianglesMesh {
     // Vertices
     List<Vector3> verticesToAdd = [ a, b, c, /* & */  c, d, a ];
     for (Vector3 v in verticesToAdd) {
-//      _vertices..add(v[0])..add(v[1])..add(v[2]);  // should work, yet it does not ?
+//      _vertices..add(v[0])..add(v[1])..add(v[2]);  // should work ?
       _vertices.addAll([v[0], v[1], v[2]]);
     }
     // UVs - Homotilic
