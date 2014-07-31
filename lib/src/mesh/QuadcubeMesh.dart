@@ -192,6 +192,9 @@ class QuadcubeMesh extends TrianglesMesh {
           duv.setValues(juvMin + (j+0)*jjuvStep, kuvMin + (k+1)*kkuvStep);
         }
 
+        // Store this, because we're writing to _vertices below
+        int quadFaceIndex = _vertices.length;
+
         // Ensure ClockWise drawing when seen from the outside
         if (i > 0) {
           _buildQuadFace(a,b,c,d,auv,buv,cuv,duv);
@@ -199,8 +202,9 @@ class QuadcubeMesh extends TrianglesMesh {
           _buildQuadFace(a,d,c,b,auv,duv,cuv,buv);
         }
 
+        // Call the hook if defined
         if (onQuadFace != null) {
-          onQuadFace(_vertices.length, sysCoords);
+          onQuadFace(quadFaceIndex, sysCoords);
         }
       }
     }
