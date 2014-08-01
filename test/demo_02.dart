@@ -158,6 +158,8 @@ main() {
   demo.gl.blendFunc(SRC_ALPHA, ONE_MINUS_SRC_ALPHA);
   demo.gl.enable(BLEND);
 
+  //demo.gl.enable(CULL_FACE);
+
   demo.start();
 
 

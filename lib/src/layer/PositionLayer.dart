@@ -29,7 +29,6 @@ void main(void) {
   }
 
   Map<String, dynamic> onDraw(World world, Model model, Renderer renderer) {
-    // fixme: VERTEX_POSITION as shared attribute
     return {
         'VERTEX_POSITION': model.mesh.vertices,
         'uMMatrix': model.matrix,
