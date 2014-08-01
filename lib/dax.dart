@@ -42,6 +42,7 @@ part 'src/error/ShaderError.dart';
 
 part 'src/layer/ColorLayer.dart';
 part 'src/layer/PositionLayer.dart';
+part 'src/layer/BoundariesLayer.dart';
 part 'src/layer/BitmapTextureLayer.dart';
 part 'src/layer/DidiLayer.dart';
 part 'src/layer/StarLayer.dart';
