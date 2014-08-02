@@ -2,6 +2,8 @@ part of dax;
 
 /**
  * https://github.com/julien/dart_mv/blob/master/lib/eventemitter.dart
+ * This is what I would've written.
+ * Unsure if I'll use this in the long run, or directly controllers (like in GoGame)
  */
 class EventEmitter {
   Map<String, StreamController> _controllers = new Map<String, StreamController>();

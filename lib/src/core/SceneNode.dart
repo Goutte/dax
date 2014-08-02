@@ -29,6 +29,19 @@ class SceneNode {
   }
 
   /**
+   * Remove a [child] of this node.
+   * If not found, yell.
+   */
+  void remove(SceneNode child) {
+    if (children.contains(child)) {
+      children.remove(child);
+      child.parent = null;
+    } else {
+      throw new Exception("Tried to remove non-child $child.");
+    }
+  }
+
+  /**
    * Removes all children of this node.
    */
   void removeChildren() {
