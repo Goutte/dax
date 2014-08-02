@@ -3,9 +3,7 @@ part of dax;
 
 /**
  * Basic color shader, no fancy effects.
- * The default color is pure white, with full opacity.
- *
- * I wonder if this is the same as Ambient Color ?
+ * The default [color] is poupou (#FF3399), with full opacity.
  */
 class ColorLayer extends MaterialLayer {
 
@@ -20,9 +18,16 @@ void main(void) {
 
   Map<String, dynamic> onSetup(World world, Model model, Renderer renderer) {
     return {
-      'uColor': new Vector3(1.0, 0.0, 1.0),
+      'uColor': color,
       'uAlpha': 1.0,
     };
   }
 
+  Vector3 color = new Vector3(1.0, 0.2, 0.6); // poupou = #FF3399
+
+  ColorLayer([Vector3 color]) : super() {
+    if (color != null) {
+      this.color.setFrom(color);
+    }
+  }
 }
