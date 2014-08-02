@@ -21,6 +21,13 @@ class SceneNode {
   List<SceneNode> children = [];
 
   /**
+   * Returns true if this scene node has the [child].
+   */
+  void has(SceneNode child) {
+    return children.contains(child);
+  }
+
+  /**
    * Add a [child] to this node.
    */
   void add(SceneNode child) {

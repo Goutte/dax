@@ -17,6 +17,12 @@ class SceneGraph {
     root = new SceneNode();
   }
 
+  /// Returns true if this scene graph has the [node] under [root].
+  bool has(SceneNode node) {
+    if (node == null) throw new ArgumentError("Added node is null.");
+    return root.has(node);
+  }
+
   /// Adds a new [node] to this scene graph, under [root].
   void add(SceneNode node) {
     if (node == null) throw new ArgumentError("Added node is null.");
