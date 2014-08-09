@@ -23,17 +23,22 @@ class TrackballCamera extends Camera implements Updatable {
 
   /// OPTIONS
 
-  num EPSILON = 10e-6;
-
   /**
    * Fraction of energy that will be lost on each update.
    * Must be between 0 and 1, inclusive. (but 1 is silly)
    * If the value is greater than 1, the movement will exponentially accelerate
-   * until something spins out of control and breaks.
+   * until something spin out of control, break and burn.
    * You can change this value at any time.
    */
   num friction = 1/15;
-  
+
+  /**
+   * When, through repeated friction, the momentum becomes less that this value,
+   * it will be clamped to zero (0). This value should be set as the minimum
+   * momentum needed to make the canvas pixels actually change.
+   */
+  num mimimum = 10e-5;
+
   num closest = 0.2;
   num farthest = 7.0;
 
@@ -69,7 +74,7 @@ class TrackballCamera extends Camera implements Updatable {
    * Will move the camera in trackball space according to its momentum.
    */
   void update(num time, num delta) {
-    // Friction
+    // Apply friction to reduce the speed
     if (friction != 0) {
       num friction_coeff = (1 - friction);
       dx = dx * friction_coeff;
@@ -77,9 +82,9 @@ class TrackballCamera extends Camera implements Updatable {
       dz = dz * friction_coeff;
     }
 
-    if (dx.abs() < EPSILON) { dx = 0.0; }
-    if (dy.abs() < EPSILON) { dy = 0.0; }
-    if (dz.abs() < EPSILON) { dz = 0.0; }
+    if (dx.abs() < mimimum) { dx = 0.0; }
+    if (dy.abs() < mimimum) { dy = 0.0; }
+    if (dz.abs() < mimimum) { dz = 0.0; }
 
     // Rotate around focus
     if (dx != 0.0 || dy != 0.0) {

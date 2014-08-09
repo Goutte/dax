@@ -8,24 +8,35 @@ part of dax;
  * - fetches WebGL's RenderingContext with default parameters, unless you provide one.
  * - controls the rendering and updating flows
  * - provide input hooks :
+ *   - mouse_clicked
  *   - mouse_moved
  *   - mouse_dragged
  *   - mouse_wheeled
+ *   - (copied jax's `_` syntax. Not sure if best, though.)
+ *     Options:
+ *        - mouse_clicked override (jax)
+ *        - mouseClicked override (dart ?)
+ *        - onMouseClick <= no, this should be a listenable Stream ?
  *
  * The (optional) Stats measure the cumulated rendering AND updating.
+ *
+ * I really am not satisfied with the current input hooking.
+ * It would probably best to roll our own, or improve game_loop if it evolves for the better.
  */
-abstract class Controller extends GameLoopHtml with EventEmitter {
+abstract class Controller extends GameLoopHtml /*with EventEmitter*/ {
 
   WebGLRenderer renderer;
   World world;
   Stats stats;
 
   /// READ-ONLY (Jax would manage WRITING to these during runtime, not only on init)
-  CanvasElement get canvas => this.element;
+  CanvasElement get canvas => this.element; // from GameLoopHtml
   WebGL.RenderingContext get gl => this._gl;
-  /// Eventually, to replace the above gl.
-  /// A Controller is a Human-Painter link/bridge
-  //Painter get painter => this._gl;
+  /// Eventually, to replace the above gl, to support CSS3 or SVG.
+  /// A Controller is a Human-Painter link/bridge, via Inputs
+  /// But that's a lot of work, and it means wrapping WebGL.RenderingContext too
+  /// Not sure what would be the difference between Renderer and Painter
+  //Painter get painter => this._painter;
 
   WebGL.RenderingContext _gl;
 //  bool _isRendering = false;
@@ -61,9 +72,16 @@ abstract class Controller extends GameLoopHtml with EventEmitter {
     // Make sure that the pointer lock on click is disabled
     pointerLock.lockOnClick = false;
 
-    // Hook game_loop GameLoopHtml streams
+    // Hook game_loop's GameLoopHtml streams
     onRender = onDefaultRender;
     onUpdate = onDefaultUpdate;
+
+    // Desactivate the mouse drag when mouse leaves the canvas
+    // This is an ugly hack -- this belong in the game loop.
+    canvas.onMouseLeave.listen((Event e) {
+      mouse.buttons[Mouse.LEFT].timeReleased = mouse.buttons[Mouse.LEFT].timePressed;
+      mouse.buttons[Mouse.LEFT].frameReleased = mouse.buttons[Mouse.LEFT].framePressed;
+    });
   }
 
 
@@ -114,6 +132,7 @@ abstract class Controller extends GameLoopHtml with EventEmitter {
   /// HOOKS FOR GAME_LOOP ------------------------------------------------------
 
   // This lot may well go away when we either fork game_loop and patch it, or roll our own.
+  // I really am not satified by this.
 
   void onDefaultRender(GameLoopHtml self) {
     if (stats != null) { stats.begin(); }
