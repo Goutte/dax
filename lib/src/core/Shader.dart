@@ -121,7 +121,7 @@ class Shader {
         Match nameMatch = nameRegex.firstMatch(nameAndArray.trim());
         String name = nameMatch.group(1);
         String arrayLength = nameMatch.group(2);
-        GlslUniform uniform = new GlslUniform(type, nameAndArray.trim());
+        GlslUniform uniform = new GlslUniform(type, name.trim());
         uniform.shared = shared;
         uniform.arrayLength = (arrayLength == null) ? null : int.parse(arrayLength);
         uniforms.add(uniform);

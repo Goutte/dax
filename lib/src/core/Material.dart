@@ -236,6 +236,7 @@ class Material {
       } else {
         String mangledName = uid + '_' + uniform.name;
         GlslUniform mangledUniform = new GlslUniform(uniform.type, mangledName);
+        mangledUniform.arrayLength = uniform.arrayLength;
         into.uniforms.add(mangledUniform);
         mangledContents = mangledContents.replaceAllMapped(
             new RegExp(r"(\b)("+uniform.name+r")(\b)"),
