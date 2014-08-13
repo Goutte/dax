@@ -15,10 +15,12 @@ import '../../lib/dax.dart';
  *   - attribute
  *   - uniform
  *   - varying
+ *   - uniform arrays
  * - multiple declarations on one line using `,`
  * - shared attribute
  * - shared uniform
  * - shared varying
+ * - comments
  * Todo support :
  * - include
  * - shared function ?
@@ -77,6 +79,7 @@ attribute vec3 aOne, aTwo, aKri;
 shared uniform vec3 U_SHARED_BY_A;
 shared uniform vec3 U_SHARED_BY_AB;
 uniform vec3 u1, u2, u3;
+uniform vec3 uArray[42];
 uniform mat4 uTest;
 shared varying vec3 V_SHARED_BY_A;
 shared varying vec3 V_SHARED_BY_AB;
@@ -129,6 +132,7 @@ uniform vec3 U_SHARED_BY_AB;
 uniform vec3 TestLayerA_u1;
 uniform vec3 TestLayerA_u2;
 uniform vec3 TestLayerA_u3;
+uniform vec3 TestLayerA_uArray[42];
 uniform mat4 TestLayerA_uTest;
 uniform mat4 TestLayerB_uTest;
 varying vec3 V_SHARED_BY_A;

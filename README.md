@@ -16,7 +16,8 @@ RoadMap
 =======
 
 The initial objective of dax is to provide enough features
-to make a simple game like [Cyx](http://antoine.goutenoir.com/games/cyx/).
+to make a simple game like [Cyx](http://antoine.goutenoir.com/games/cyx/) or
+[PlanetGL](http://planet.gl/).
 
 
 Transparency
@@ -42,7 +43,6 @@ Features you'd expect but have not been implemented.
 
 (pick one, hack one)
 
-- Shader preprocessor `shared` variables
 - Camera's Octree
 - Lights
   - AmbientLight

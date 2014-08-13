@@ -11,7 +11,7 @@ part of dax;
  * WARNING :
  * The preprocessor is still quite dumb, and does not mangle all extra code
  * outside of the main that is not a GLSL variable declaration.
- * Also, #includes don't not work (yet).
+ * Also, #includes don't work (yet). They woumld be awesome.
  */
 class Material {
 

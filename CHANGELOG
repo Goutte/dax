@@ -3,6 +3,8 @@
 ------------
 
 - Add copy of EventEmitter (from https://github.com/julien/dart_mv/blob/master/lib/eventemitter.dart)
+  Not sure we're *really* gonna use that in the long run. StreamControllers may be enough. Bit verbose.
+- Add support for uniform arrays
 
 
 

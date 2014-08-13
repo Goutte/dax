@@ -2,8 +2,15 @@ part of dax;
 
 
 class GlslVariable {
+
+  /// The [name] of the variable
   String name;
+
+  /// The GLSL [type] of the variable
   String type;
+
+  /// An array variable has a non-null [arrayLength]
+  int arrayLength;
 
   /// A [shared] variable (between layers) does no submit to [name]-mangling.
   bool shared = false;
@@ -11,10 +18,17 @@ class GlslVariable {
   /// The number of elements (floats, ints) of the [type] of this variable.
   int get size => _getSize();
 
+  /// The additional '[42]' suffixing the variable declaration if it's an array.
+  String get arraySuffix => _getArraySuffix();
+
   GlslVariable(this.type, this.name);
 
   operator == (GlslVariable other) {
     return type == other.type && name == other.name;
+  }
+
+  String _getArraySuffix() {
+    return (arrayLength == null) ? '' : "[${arrayLength}]";
   }
 
   int _getSize() {

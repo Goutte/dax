@@ -51,7 +51,7 @@ class Shader {
     }
 
     for (GlslUniform uniform in uniforms) {
-      s += "uniform ${uniform.type} ${uniform.name};\n";
+      s += "uniform ${uniform.type} ${uniform.name}${uniform.arraySuffix};\n";
     }
 
     for (GlslVarying varying in varyings) {
@@ -89,11 +89,13 @@ class Shader {
     RegExp attributeRegex = new RegExp(
         r"(shared|)\s*attribute\s+([\w]+)\s+((?:[\w]+\s*,?\s*)+);", multiLine: true);
     RegExp uniformRegex = new RegExp(
-        r"(shared|)\s*uniform\s+([\w]+)\s+((?:[\w]+\s*,?\s*)+);", multiLine: true);
+        r"(shared|)\s*uniform\s+([\w]+)\s+((?:[\w]+(?:\[[0-9]+\])?\s*,?\s*)+);", multiLine: true);
     RegExp varyingRegex = new RegExp(
         r"(shared|)\s*varying\s+([\w]+)\s+((?:[\w]+\s*,?\s*)+);", multiLine: true);
     RegExp mainRegex = new RegExp(
         r"void main\s*\([^)]*\)\s*\{((?:.|\s)*)\}", multiLine: true);
+
+    RegExp nameRegex = new RegExp(r"([\w]+)(?:\[([0-9]+)\])?", multiLine: true);
 
     // List of [start, end] so that we may collect all not-regex-collected code.
     List weGotIt = [];
@@ -115,9 +117,13 @@ class Shader {
       bool shared = match.group(1).isNotEmpty;
       String type = match.group(2);
       List names = match.group(3).split(",");
-      for (String name in names) {
-        GlslUniform uniform = new GlslUniform(type, name.trim());
+      for (String nameAndArray in names) {
+        Match nameMatch = nameRegex.firstMatch(nameAndArray.trim());
+        String name = nameMatch.group(1);
+        String arrayLength = nameMatch.group(2);
+        GlslUniform uniform = new GlslUniform(type, nameAndArray.trim());
         uniform.shared = shared;
+        uniform.arrayLength = (arrayLength == null) ? null : int.parse(arrayLength);
         uniforms.add(uniform);
       }
     }
