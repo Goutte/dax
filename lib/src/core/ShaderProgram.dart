@@ -93,12 +93,15 @@ class ShaderProgram {
   void setUniform(WebGL.RenderingContext gl, GlslUniform variable, value) {
 
     var location = uniformsLocations[variable.name];
+
+//    print("set uniform ${variable.name}");
     
     switch (variable.type) {
       case 'float':
         return gl.uniform1f(location, value);
       case 'bool':
       case 'int':
+//        print("setUniform int ${value}");
         return gl.uniform1i(location, value);
       case 'vec2':
         return gl.uniform2fv(location, value);
