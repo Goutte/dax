@@ -14,6 +14,7 @@ part of dax;
  *
  * WARNING: parsing will ignore code outside of main() that is not variable
  *          declaration, so beware !
+ *          You cannot use the character `}` inside of the main() function !
  */
 class Shader {
 
@@ -86,6 +87,7 @@ class Shader {
   _parseGlsl(String glsl) {
 
     // `.` does not match carriage returns, even with multiLine, but \s does.
+    // Also, not sure about multiLine's documentation :s
     RegExp attributeRegex = new RegExp(
         r"(shared|)\s*attribute\s+([\w]+)\s+((?:[\w]+\s*,?\s*)+);", multiLine: true);
     RegExp uniformRegex = new RegExp(
@@ -93,7 +95,9 @@ class Shader {
     RegExp varyingRegex = new RegExp(
         r"(shared|)\s*varying\s+([\w]+)\s+((?:[\w]+\s*,?\s*)+);", multiLine: true);
     RegExp mainRegex = new RegExp(
-        r"void main\s*\([^)]*\)\s*\{((?:.|\s)*)\}", multiLine: true);
+        r"void main\s*\([^)]*\)\s*\{([^}]*)\}", multiLine: true);
+    // takes too long to complete !
+//        r"void main\s*\([^)]*\)\s*\{((?:.|\s)*)\}", multiLine: true);
 
     RegExp nameRegex = new RegExp(r"([\w]+)(?:\[([0-9]+)\])?", multiLine: true);
 

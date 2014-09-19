@@ -30,6 +30,22 @@ void main (void) {
     """));
   });
 
+  test('supports big glsl shaders', () {
+    String long = "";
+    for (int i = 0; i < 512; i++) {
+      long += "aVeryLongInstructionWithLotsOfCharacters(vec3(0.1241546645647, 1.4596418744545634, 5.459785634524));\n";
+    }
+    String glsl = """
+void main (void) {
+    $long
+}
+    """;
+
+    Shader shader = new Shader(glsl);
+
+    expect(shader.main.contents, equalsIgnoringWhitespace(long));
+  });
+
 
 }
 
