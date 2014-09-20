@@ -1,6 +1,22 @@
 part of dax;
 
 
+
+class FragmentShader extends Shader {
+
+  String toString() {
+    String s = "precision mediump float;\nprecision mediump int;\n\n";
+    s += super.toString();
+    return s;
+  }
+
+}
+
+
+class VertexShader extends Shader {}
+
+
+
 /**
  * A Shader is a single vertex or fragment shader whose components have been
  * parsed and analysed, so that merging shaders is easier for the Material.
@@ -8,13 +24,13 @@ part of dax;
  * - uniforms
  * - attributes
  * - main
+ * - other
  *
  * This uses Regexes to parse the GLSL, and those are pretty dumb right now.
  * Therefore, they may fail ; thankfully, there is a test-suite for that !
  *
- * WARNING: parsing will ignore code outside of main() that is not variable
+ * WARNING: parsing will ignore code below main() that is not variable
  *          declaration, so beware !
- *          You cannot use the character `}` inside of the main() function !
  */
 class Shader {
 
@@ -96,8 +112,8 @@ class Shader {
         r"(shared|)\s*varying\s+([\w]+)\s+((?:[\w]+\s*,?\s*)+);", multiLine: true);
     RegExp mainRegex = new RegExp(
         r"void main\s*\([^)]*\)\s*\{([\s\S]*)\}", multiLine: true);
-    // takes too long to complete !
-//        r"void main\s*\([^)]*\)\s*\{((?:.|\s)*)\}", multiLine: true);
+    // takes too long to complete as we generate a long shader code ! (kept for educational purposes)
+    //    r"void main\s*\([^)]*\)\s*\{((?:.|\s)*)\}", multiLine: true);
 
     RegExp nameRegex = new RegExp(r"([\w]+)(?:\[([0-9]+)\])?", multiLine: true);
 
@@ -167,17 +183,3 @@ class Shader {
   }
 
 }
-
-
-class FragmentShader extends Shader {
-
-  String toString() {
-    String s = "precision mediump float;\nprecision mediump int;\n\n";
-    s += super.toString();
-    return s;
-  }
-
-}
-
-
-class VertexShader extends Shader {}
