@@ -86,7 +86,7 @@ class Shader {
 
   _parseGlsl(String glsl) {
 
-    // `.` does not match carriage returns, even with multiLine, but \s does.
+    // `.` does not match carriage returns, even with multiLine, but \s\S does.
     // Also, not sure about multiLine's documentation :s
     RegExp attributeRegex = new RegExp(
         r"(shared|)\s*attribute\s+([\w]+)\s+((?:[\w]+\s*,?\s*)+);", multiLine: true);
@@ -95,7 +95,7 @@ class Shader {
     RegExp varyingRegex = new RegExp(
         r"(shared|)\s*varying\s+([\w]+)\s+((?:[\w]+\s*,?\s*)+);", multiLine: true);
     RegExp mainRegex = new RegExp(
-        r"void main\s*\([^)]*\)\s*\{([^}]*)\}", multiLine: true);
+        r"void main\s*\([^)]*\)\s*\{([\s\S]*)\}", multiLine: true);
     // takes too long to complete !
 //        r"void main\s*\([^)]*\)\s*\{((?:.|\s)*)\}", multiLine: true);
 
