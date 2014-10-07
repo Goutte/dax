@@ -12,7 +12,6 @@ class FragmentShader extends Shader {
 
 }
 
-
 class VertexShader extends Shader {}
 
 

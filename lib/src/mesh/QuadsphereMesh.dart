@@ -5,10 +5,9 @@ part of dax;
  * A quadsphere is a quadrilateralized spherical cube.
  * http://en.wikipedia.org/wiki/Quadrilateralized_spherical_cube
  *
- * It is a projection of a quadrilateralized cube onto its circumscribed sphere,
- * where the distortion of the tangential (gnomonic) projection
+ * It is a tangential (gnomonic) projection of a quadrilateralized cube onto its
+ * circumscribed sphere, where the distortion of the projection
  * is compensated by a further curvilinear transformation.
- *
  * This makes it approximately equal-area, with no singularities at the poles.
  * Distortion is moderate over the entire sphere.
  *

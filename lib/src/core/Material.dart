@@ -138,7 +138,6 @@ class Material {
 
   List<GlslAttribute> _collectAttributes() {
     List<GlslAttribute> attributes = [];
-    attributes.addAll(fragment.attributes);
     attributes.addAll(vertex.attributes);
     return attributes;
   }

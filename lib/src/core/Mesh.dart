@@ -52,9 +52,8 @@ class BoundingBox {
 
 
 /**
- * Vertices iterator as Vector3 for draw modes POINT and TRIANGLES.
+ * Vertices iterator as Vector3.
  * It reads the draw-ready vertices flat list and iterates over Vector3.
- * Will (ig) not work with TRIANGLE_STRIP and TRIANGLE_FAN, but they can have their own.
  */
 class MeshVerticesIterator implements Iterator {
   bool _hasMoved = false;
@@ -109,12 +108,85 @@ class MeshVerticesIterator implements Iterator {
 }
 
 /**
- * May provide different types for other draw modes here ?
+ * Triangles iterator as Vector3 for draw modes POINT and TRIANGLES.
+ * It reads the draw-ready vertices flat list and iterates over Vector3.
+ * Todo: Will not work with TRIANGLE_STRIP and TRIANGLE_FAN as is.
+ */
+class MeshTrianglesIterator implements Iterator {
+  bool _hasMoved = false;
+  int _current = 0;
+  int _total;
+
+  List<double> vertices;
+
+  MeshTrianglesIterator(List<double> this.vertices) {
+    _total = vertices.length;
+  }
+
+  Vector3 get current => _getCurrent();
+
+  Vector3 _getCurrent() {
+    if (_hasMoved) {
+      if (_canReadCurrent()) {
+        return new Triangle.coordinates(
+            vertices[_current  ],
+            vertices[_current+1],
+            vertices[_current+2],
+            vertices[_current+3],
+            vertices[_current+4],
+            vertices[_current+5],
+            vertices[_current+6],
+            vertices[_current+7],
+            vertices[_current+8]
+        );
+      } else {
+        return null;
+      }
+    } else {
+      return null;
+    }
+  }
+
+  bool _canReadCurrent() {
+    return (_current + 8 < _total);
+  }
+
+  bool moveNext() {
+    if ((!_hasMoved) && _canReadCurrent()) {
+      _hasMoved = true;
+      return true;
+    }
+    // we ignore the values if there's less than 9 left.
+    if (_canReadCurrent()) {
+      _current += 9;
+      if (_canReadCurrent()) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
+  }
+}
+
+/**
+ *
  */
 class VerticesCollectionFromFlat extends IterableBase<Vector3> {
   Iterator iterator;
   VerticesCollectionFromFlat(flatVertices) {
     iterator = new MeshVerticesIterator(flatVertices);
+  }
+}
+
+/**
+ * Other draw modes should be supported too. They're not, at present.
+ */
+class TrianglesCollectionFromFlat extends IterableBase<Vector3> {
+  Iterator iterator;
+  TrianglesCollectionFromFlat(flatVertices) {
+    iterator = new MeshTrianglesIterator(flatVertices);
   }
 }
 
@@ -163,6 +235,8 @@ abstract class Mesh {
   }
 
   Iterable<Vector3> get verticesAsVector3 => new VerticesCollectionFromFlat(vertices);
+
+  Iterable<Triangle> get triangles => new TrianglesCollectionFromFlat(vertices);
 
 }
 

@@ -72,6 +72,8 @@ class ShaderProgram {
   void setAttribute(WebGL.RenderingContext gl, GlslAttribute attribute, List value) {
     var location = attributesLocations[attribute.name];
 
+//    print("Set Attribute ${attribute.name}");
+
 //    if (!attributesBuffers.containsKey(attribute.name)) {
     // fixme: don't re-create a GL buffer ! instead, cache it using value's HashCode (or something)
     // createBuffer() asks the WebGL system to allocate some data for us
@@ -164,7 +166,7 @@ class ShaderProgram {
 //          }
 
           gl.bindTexture(target, handle);
-          return gl.uniform1i(location, 0); // fixme : textureIndex instead of 0 ?
+          return gl.uniform1i(location, 0); // fixme : textureIndex instead of 0 !
         } else {
           throw new ArgumentError("sampler2D must be an instance of BitmapTexture");
         }

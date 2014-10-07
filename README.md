@@ -15,7 +15,8 @@ I do not recommend using this as-is, unless you want to hack away with the lib,
 which you're encouraged to do.
 
 I have very basic needs, and I will only implement what I need.
-Hopefully, these needs will grow with time, and so will the features of dax.
+Hopefully, these needs will grow with time if my [game of go](http://ægo.com) lives,
+and then so will the features of dax.
 
 
 RoadMap
@@ -24,6 +25,8 @@ RoadMap
 The initial objective of dax is to provide enough features
 to make a simple game like [Cyx](http://antoine.goutenoir.com/games/cyx/) or
 [PlanetGL](http://planet.gl/).
+
+The only (known) usage of dax to this day is [ÆGO](http://ægo.com).
 
 
 Transparency
@@ -57,6 +60,7 @@ Features you'd expect but have not been implemented.
   - SpotLight (extends SpatialSceneNode)
 - more Meshes
 - more Shaders
+- other GL draw modes (TRIANGLE_FAN and TRIANGLE_STRIP)
 
 
 Dependencies
