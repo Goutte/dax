@@ -21,11 +21,16 @@ uniform mat4 uMMatrix;
 uniform mat4 uVMatrix;
 uniform mat4 uPMatrix;
 
+shared varying vec3 FRAGMENT_LOCAL_POSITION;
+
 void main(void) {
+    FRAGMENT_LOCAL_POSITION = VERTEX_POSITION;
     gl_Position = uPMatrix * uVMatrix * uMMatrix * vec4(VERTEX_POSITION, 1.0);
 }
   """;
-  String get glslFragment => "";
+  String get glslFragment => """
+shared varying vec3 FRAGMENT_LOCAL_POSITION;
+  """;
 
 
   Map<String, dynamic> onSetup(World world, Model model, Renderer renderer) {
