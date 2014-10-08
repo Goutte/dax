@@ -22,10 +22,13 @@ uniform mat4 uVMatrix;
 uniform mat4 uPMatrix;
 
 shared varying vec3 FRAGMENT_LOCAL_POSITION;
+shared varying vec3 FRAGMENT_WORLD_POSITION;
 
 void main(void) {
+    vec4 worldPosition = uMMatrix * vec4(VERTEX_POSITION, 1.0);
     FRAGMENT_LOCAL_POSITION = VERTEX_POSITION;
-    gl_Position = uPMatrix * uVMatrix * uMMatrix * vec4(VERTEX_POSITION, 1.0);
+    FRAGMENT_WORLD_POSITION = vec3(worldPosition);
+    gl_Position = uPMatrix * uVMatrix * worldPosition;
 }
   """;
   String get glslFragment => """
