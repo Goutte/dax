@@ -19,9 +19,9 @@ class Material {
 
   Shader _vertex;
   Shader _fragment;
+
   /// Maps the names of the variables as defined in the layers' shaders to
   /// the names of the variable as defined in this material's shader.
-  /// If two layers
 //  Map<String, String> _mangledNames = {};
 
   Shader get vertex => _generateVertexShader();
@@ -47,11 +47,18 @@ class Material {
 
   /**
    * Returns the layer described by its [layerName].
-   * If no layer is found with that name in this Material, it throws.
+   * Supports specifying the name of the layer without the suffix 'Layer'.
+   * Therefore, if you have the following :
+   *   - HackLayerLayer
+   *   - HackLayer
+   * getLayer('HackLayer') will return the first one, not the second.
+   * If no layer is found with that name in this Material, this throws.
    */
   MaterialLayer getLayer(String layerName) {
     for (MaterialLayer layer in layers) {
-      if (layer.name == layerName) return layer;
+      if (layer.name == layerName || layer.name == layerName + 'Layer') {
+        return layer;
+      }
     }
     throw new Exception("Layer '${layerName}' was not found in ${name}.");
   }
@@ -91,7 +98,6 @@ class Material {
     }
   }
 
-
   /**
    * Returns the mangled (if necessary, ie if not shared) name of [variableName]
    * defined [inLayer].
@@ -125,9 +131,10 @@ class Material {
         value is Matrix3 ||
         value is Matrix4 ) {
       value = value.storage;
-    } else if (value is List && !(value is TypedData)) {
-      value = new Float32List.fromList(value);
     }
+//    else if (value is List && !(value is TypedData)) {
+//      value = new Float32List.fromList(value);
+//    }
 
     String mangledName = getMangledName(variableName, layer);
 
@@ -259,14 +266,12 @@ class Material {
       }
     }
 
-    // warning: collisions detected -- should also (somehow) mangle the other
+    // warning: collisions will happen -- should also mangle the other
+    // by detecting functions, and allowing them to be shared, too.
     into.other += from.other;
 
     into.other += "void main_${uid}(void) {${mangledContents}}\n";
     into.main.contents += "main_${uid}();\n";
   }
 
-  /// TESTING UTILS ------------------------------------------------------------
-
 }
-

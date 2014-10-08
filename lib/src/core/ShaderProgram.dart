@@ -2,6 +2,9 @@ part of dax;
 
 /**
  * A small wrapper for `WebGL.Program`.
+ *
+ * This can be completely rewritten, or refactored.
+ * It's really hacky and featureless ATM. Dip in !
  */
 class ShaderProgram {
 
@@ -11,6 +14,7 @@ class ShaderProgram {
   /// For the shader these are read-only variables.
   Map<String, GlslAttribute> attributes = {};
   Map<String, int> attributesLocations = {};
+  Map<String, String> attributesHashCodes = {};
   Map<String, WebGL.Buffer> attributesBuffers = {};
 
   /// [uniforms] : Global variables that may change per primitive
@@ -32,6 +36,8 @@ class ShaderProgram {
                 List<GlslAttribute> attributes,
                 List<GlslUniform> uniforms)
   {
+    print("Creating a program");
+
     fragmentShader = gl.createShader(WebGL.FRAGMENT_SHADER);
     gl.shaderSource(fragmentShader, fragmentGlsl);
     gl.compileShader(fragmentShader);
@@ -72,20 +78,25 @@ class ShaderProgram {
   void setAttribute(WebGL.RenderingContext gl, GlslAttribute attribute, List value) {
     var location = attributesLocations[attribute.name];
 
-//    print("Set Attribute ${attribute.name}");
+    if (!attributesBuffers.containsKey(attribute.name)) {
+      // createBuffer() asks the WebGL system to allocate some data for us
+      attributesBuffers[attribute.name] = gl.createBuffer();
+    }
 
-//    if (!attributesBuffers.containsKey(attribute.name)) {
-    // fixme: don't re-create a GL buffer ! instead, cache it using value's HashCode (or something)
-    // createBuffer() asks the WebGL system to allocate some data for us
-    attributesBuffers[attribute.name] = gl.createBuffer();
-    // bindBuffer() tells the WebGL system the target of call to bufferDataTyped
+    // bindBuffer() tells WebGL the target of the call to bufferDataTyped
+    // and vertexAttribPointer (I suppose, for the latter)
     gl.bindBuffer(WebGL.ARRAY_BUFFER, attributesBuffers[attribute.name]);
-    gl.bufferDataTyped(WebGL.ARRAY_BUFFER, new Float32List.fromList(value), WebGL.STATIC_DRAW);
-//    }
 
-    WebGL.Buffer buffer = attributesBuffers[attribute.name];
-
-    gl.bindBuffer(WebGL.ARRAY_BUFFER, buffer);
+    // We won't re-feed the buffer the data if its hashCode has not changed
+    // This will probably cause some confusion ;
+    // how to track the staleness of a List cheaply ?
+    String hashCode = value.hashCode;
+    if (!attributesHashCodes.containsKey(attribute.name) ||
+        attributesHashCodes[attribute.name] != hashCode)
+    {
+      attributesHashCodes[attribute.name] = hashCode;
+      gl.bufferDataTyped(WebGL.ARRAY_BUFFER, new Float32List.fromList(value), WebGL.STATIC_DRAW);
+    }
 
     return gl.vertexAttribPointer(location, attribute.size, WebGL.FLOAT, false, 0, 0);
   }
