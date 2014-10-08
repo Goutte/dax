@@ -1,7 +1,7 @@
 name: dax
 author: Goutte <antoine@goutenoir.com>
 description: Experimental framework for developing WebGL-enabled applications.
-version: 0.2.1
+version: 0.2.2
 environment:
   sdk: '>=0.8.10+6 <2.0.0'
 dependencies:
@@ -9,7 +9,7 @@ dependencies:
 
   # Added some code to vector_math. Not much, and might be PR'ed some day.
   # That lib needs a lot more work, and maybe some more memory-friendly APIs,
-  # like glmatrix provides. (by providing out)
+  # like glmatrix provides. (by providing `out`)
   # Besides, thanks to tree-shaking, we can make a bigass math lib with everything.
   #vector_math: '>=1.4.2+1 <2.0.0'
   vector_math:
