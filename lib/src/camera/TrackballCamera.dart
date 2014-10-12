@@ -17,6 +17,9 @@ Vector3 _cameraPosition  = new Vector3.zero();
  */
 class TrackballCamera extends Camera implements Updatable {
 
+  /// Cartesian velocities. On each update, their values will be used to create
+  /// a quaternion rotation. Their referential is the right-handed eye of the
+  /// observer : X to the right, Y to the top, and Z poking in the eye.
   num dx = 0.0;
   num dy = 0.0;
   num dz = 0.0;
@@ -30,16 +33,16 @@ class TrackballCamera extends Camera implements Updatable {
    * until something spin out of control, break and burn.
    * You can change this value at any time.
    */
-  num friction = 1/15;
+  num friction = 1/11;
 
   /**
-   * When, through repeated friction, the momentum becomes less that this value,
+   * When, through repeated friction, the speed becomes less that this value,
    * it will be clamped to zero (0). This value should be set as the minimum
    * momentum needed to make the canvas pixels actually change.
    */
-  num mimimum = 10e-5;
+  num mimimum = 2e-3;
 
-  num closest = 0.2;
+  num closest = 1.0;
   num farthest = 7.0;
 
   /// CONSTRUCTORS -------------------------------------------------------------
@@ -84,7 +87,7 @@ class TrackballCamera extends Camera implements Updatable {
 
     if (dx.abs() < mimimum) { dx = 0.0; }
     if (dy.abs() < mimimum) { dy = 0.0; }
-    if (dz.abs() < mimimum) { dz = 0.0; }
+    if (dz.abs() < mimimum/10) { dz = 0.0; }
 
     // Rotate around focus
     if (dx != 0.0 || dy != 0.0) {
@@ -115,7 +118,7 @@ class TrackballCamera extends Camera implements Updatable {
 
     // Smooth push towards boundaries if out of them
     if (distance < closest) {
-      dz = dz + (closest - distance) * 0.00333;
+      dz = dz + (closest - distance) * 0.111;
     }
     if (distance > farthest) {
       dz = dz - (distance - farthest) * 0.00333;

@@ -6,6 +6,7 @@
   Not sure we're *really* gonna use that in the long run. StreamControllers may be enough. Bit verbose.
 - Add support for uniform arrays.
 - Fix a memory leak in the attributes' buffers.
+- Add homemade Color class
 
 
 

@@ -1,5 +1,8 @@
 library dax_cli;
 
+/// All the dax stuff that does not require dart:html and consorts.
+/// Note that there still are things that are in dax that can safely be moved here.
+
 import 'dart:math';
 
 import 'package:vector_math/vector_math.dart';

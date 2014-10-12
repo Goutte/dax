@@ -7,7 +7,6 @@ import 'dart:collection';
 import 'dart:web_gl' as WebGL;
 import 'dart:typed_data';
 
-//import 'package:color/color.dart';
 import 'package:vector_math/vector_math.dart';
 import 'package:stats/stats.dart';
 import 'package:game_loop/game_loop_html.dart';
