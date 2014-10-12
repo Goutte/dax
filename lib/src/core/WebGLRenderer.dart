@@ -19,7 +19,7 @@ class WebGLRenderer extends Renderer {
   void draw(World world) {
     // World's cosmic background color is the clear() color
     Color background = world.background;
-    gl.clearColor(background.r/256, background.g/256, background.b/256, 1.0);
+    gl.clearColor(background.r, background.g, background.b, 1.0);
     gl.clear(WebGL.COLOR_BUFFER_BIT | WebGL.DEPTH_BUFFER_BIT);
     _drawNode(world.root, world);
   }

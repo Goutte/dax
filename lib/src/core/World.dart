@@ -15,7 +15,7 @@ class World extends SceneGraph {
 
   World({ Color background, Camera camera }) : super() {
     if (background == null) {
-      background = new Color.rgb(1,1,1);
+      background = new Color.hex("#010101");
     }
     this.background = background;
 
