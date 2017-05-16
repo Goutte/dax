@@ -77,7 +77,7 @@ abstract class Controller extends GameLoopHtml /*with EventEmitter*/ {
     onUpdate = onDefaultUpdate;
 
     // Desactivate the mouse drag when mouse leaves the canvas
-    // This is an ugly hack -- this belong in the game loop.
+    // This is an ugly hack -- this belongs in the game loop.
     canvas.onMouseLeave.listen((Event e) {
       mouse.buttons[Mouse.LEFT].timeReleased = mouse.buttons[Mouse.LEFT].timePressed;
       mouse.buttons[Mouse.LEFT].frameReleased = mouse.buttons[Mouse.LEFT].framePressed;
