@@ -30,6 +30,8 @@ dependencies:
   stats: '>=0.1.2 <1.0.0'
   # Still pretty unsure about : using this / a fork of it / rollin our own
   game_loop:
-      git: https://github.com/adam-singer/game_loop.git
+    git:
+      ref: master
+      url: https://github.com/Goutte/game_loop
 dev_dependencies:
   unittest: '>=0.9.0 <1.0.0'
