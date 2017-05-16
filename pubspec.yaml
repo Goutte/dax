@@ -32,6 +32,6 @@ dependencies:
   game_loop:
     git:
       ref: master
-      url: https://github.com/Fox32/game_loop
+      url: https://github.com/Goutte/game_loop
 dev_dependencies:
   unittest: '>=0.9.0 <1.0.0'
