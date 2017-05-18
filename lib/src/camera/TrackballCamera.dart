@@ -10,7 +10,7 @@ Vector3 _cameraPosition  = new Vector3.zero();
 /**
  * Responsibilities:
  *   - provides an API to move in a sphere around a focus point.
- *   - C'est pas la bulle qui grossit c'est le monde qui se rapproche.
+ *   - C'est pas la bulle qui grossit c'est le monde qui se rapproche. (didi)
  *
  * Caveats:
  *   - (tofix) If the focus is not (0,0,0), the camera will misbehave.
@@ -20,6 +20,9 @@ class TrackballCamera extends Camera implements Updatable {
   /// Cartesian velocities. On each update, their values will be used to create
   /// a quaternion rotation. Their referential is the right-handed eye of the
   /// observer : X to the right, Y to the top, and Z poking in the eye.
+  /// In this case, the right-handed convention (from maths and physics, afaik)
+  /// is a debatable choice, as Z going towards the focal point feels intuitive
+  /// as well. Please voice which one you prefer and think is best.
   num dx = 0.0;
   num dy = 0.0;
   num dz = 0.0;
@@ -28,9 +31,11 @@ class TrackballCamera extends Camera implements Updatable {
 
   /**
    * Fraction of energy that will be lost on each update.
-   * Must be between 0 and 1, inclusive. (but 1 is silly)
-   * If the value is greater than 1, the movement will exponentially accelerate
-   * until something spin out of control, break and burn.
+   * Must be between 0 and 1, inclusive.
+   * If this value is set to 1, the camera won't move. Don't do that.
+   * If this value is set to something greater than 1,
+   * the movement will exponentially(?) accelerate
+   * until something spins out of control, breaks and burns. (usually, a brain)
    * You can change this value at any time.
    */
   num friction = 1/11;
@@ -78,8 +83,9 @@ class TrackballCamera extends Camera implements Updatable {
    */
   void update(num time, num delta) {
     // Apply friction to reduce the speed
-    if (friction != 0) {
-      num friction_coeff = (1 - friction);
+    // (multiply it every tick by something slightly less than 1)
+    if (friction != 0.0) {
+      num friction_coeff = (1.0 - friction);
       dx = dx * friction_coeff;
       dy = dy * friction_coeff;
       dz = dz * friction_coeff;
@@ -87,12 +93,12 @@ class TrackballCamera extends Camera implements Updatable {
 
     if (dx.abs() < mimimum) { dx = 0.0; }
     if (dy.abs() < mimimum) { dy = 0.0; }
-    if (dz.abs() < mimimum/10) { dz = 0.0; }
+    if (dz.abs() < mimimum/10.0) { dz = 0.0; }
 
     // Rotate around focus
     if (dx != 0.0 || dy != 0.0) {
-      _cameraQuatUp.setAxisAngle(up,    -1 * dx);
-      _cameraQuatRi.setAxisAngle(right,  1 * dy);
+      _cameraQuatUp.setAxisAngle(up,    -1.0 * dx);
+      _cameraQuatRi.setAxisAngle(right,  1.0 * dy);
       _cameraQuat = _cameraQuatUp.multiplyInto(_cameraQuatRi, _cameraQuat);
 
       Vector3 oldDirection = direction.clone();
@@ -112,7 +118,7 @@ class TrackballCamera extends Camera implements Updatable {
       if (dz < 0 && distance < closest) { dz = dz * 0.333; }
       // We're too faaaaaar awaaaaaaa-a-aa-aaay !
       if (dz > 0 && distance > farthest) { dz = dz * 0.999; }
-      _cameraPosition.add(direction * dz * -1);
+      _cameraPosition.add(direction * dz * -1.0);
       setPosition(_cameraPosition);
     }
 

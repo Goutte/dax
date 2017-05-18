@@ -114,7 +114,6 @@ class ShaderProgram {
         return gl.uniform1f(location, value);
       case 'bool':
       case 'int':
-//        print("setUniform int ${value}");
         return gl.uniform1i(location, value);
       case 'vec2':
         return gl.uniform2fv(location, value);

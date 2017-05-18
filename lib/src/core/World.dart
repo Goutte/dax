@@ -42,7 +42,7 @@ class World extends SceneGraph {
 
   void _updateNodeAndChildren(SceneNode node, num time, num delta) {
     if (node is Updatable) {
-      _updateUpdatable(node, time, delta);
+      _updateUpdatable(node as Updatable, time, delta);
     }
     for (SceneNode child in node.children) {
       _updateNodeAndChildren(child, time, delta);

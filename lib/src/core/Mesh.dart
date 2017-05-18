@@ -108,7 +108,7 @@ class MeshVerticesIterator implements Iterator {
 }
 
 /**
- * Triangles iterator as Vector3 for draw modes POINT and TRIANGLES.
+ * Triangles iterator as Triangles for draw modes POINT and TRIANGLES.
  * It reads the draw-ready vertices flat list and iterates over Vector3.
  * Todo: Will not work with TRIANGLE_STRIP and TRIANGLE_FAN as is.
  */
@@ -123,9 +123,9 @@ class MeshTrianglesIterator implements Iterator {
     _total = vertices.length;
   }
 
-  Vector3 get current => _getCurrent();
+  Triangle get current => _getCurrent();
 
-  Vector3 _getCurrent() {
+  Triangle _getCurrent() {
     if (_hasMoved) {
       if (_canReadCurrent()) {
         return new Triangle.coordinates(
@@ -183,7 +183,7 @@ class VerticesCollectionFromFlat extends IterableBase<Vector3> {
 /**
  * Other draw modes should be supported too. They're not, at present.
  */
-class TrianglesCollectionFromFlat extends IterableBase<Vector3> {
+class TrianglesCollectionFromFlat extends IterableBase<Triangle> {
   Iterator iterator;
   TrianglesCollectionFromFlat(flatVertices) {
     iterator = new MeshTrianglesIterator(flatVertices);

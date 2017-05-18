@@ -23,7 +23,7 @@ class SceneNode {
   /**
    * Returns true if this scene node has the [child].
    */
-  void has(SceneNode child) {
+  bool has(SceneNode child) {
     return children.contains(child);
   }
 
