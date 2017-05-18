@@ -30,6 +30,7 @@ dependencies:
   stats: '>=0.1.2 <1.0.0'
   # Still pretty unsure about : using this / a fork of it / rollin our own
   game_loop:
+#    path: /home/goutte/code/aego/game_loop/
     git:
       ref: master
       url: https://github.com/Goutte/game_loop
