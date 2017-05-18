@@ -32,4 +32,16 @@ class TrackballController extends Controller {
     num dz = mouse.wheelDy.toDouble() * wheel_strength;
     camera.trackball(0.0, 0.0, dz);
   }
+
+
+  num touch_drag_strength = 1/999;
+  touch_dragged(GameLoopTouch touch) {
+    if (touch.positions.length < 2) { return; }
+    TrackballCamera camera = world.camera;
+    GameLoopTouchPosition p1 = touch.positions[touch.positions.length-2];
+    GameLoopTouchPosition p2 = touch.positions[touch.positions.length-1];
+    num dx = (p2.x-p1.x) * touch_drag_strength * -1;
+    num dy = (p2.y-p1.y) * touch_drag_strength; // oddity, see game_loop
+    camera.trackball(dx, dy, 0.0);
+  }
 }

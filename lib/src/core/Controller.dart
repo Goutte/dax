@@ -75,6 +75,8 @@ abstract class Controller extends GameLoopHtml /*with EventEmitter*/ {
     // Hook game_loop's GameLoopHtml streams
     onRender = onDefaultRender;
     onUpdate = onDefaultUpdate;
+    onTouchStart = onDefaultTouchStart;
+    onTouchMove = onDefaultTouchMove;
 
     // Desactivate the mouse drag when mouse leaves the canvas
     // This is an ugly hack -- this belongs in the game loop.
@@ -121,6 +123,13 @@ abstract class Controller extends GameLoopHtml /*with EventEmitter*/ {
   mouse_dragged(Mouse mouse) {}
 
 
+  /**
+   * Override this.
+   * It is called on each drag of the [touch].
+   */
+  touch_dragged(GameLoopTouch touch) {}
+
+
 
 
 
@@ -132,7 +141,7 @@ abstract class Controller extends GameLoopHtml /*with EventEmitter*/ {
   /// HOOKS FOR GAME_LOOP ------------------------------------------------------
 
   // This lot may well go away when we either fork game_loop and patch it, or roll our own.
-  // I really am not satified by this.
+  // I really am not satisfied by this.
 
   void onDefaultRender(GameLoopHtml self) {
     if (stats != null) { stats.begin(); }
@@ -160,6 +169,7 @@ abstract class Controller extends GameLoopHtml /*with EventEmitter*/ {
       _isClicking = true;
       _dxSinceDown = 0.0;
       _dySinceDown = 0.0;
+
     }
     if (mouse.isDown(Mouse.LEFT)) {
       _dxSinceDown += dx.abs();
@@ -191,5 +201,15 @@ abstract class Controller extends GameLoopHtml /*with EventEmitter*/ {
   }
 
 
+  void onDefaultTouchMove (GameLoopHtml self, GameLoopTouch glTouch) {
+    //window.alert("! "+glTouch.positions.length.toString()); // OK ?
+    touch_dragged(glTouch);
+  }
+
+  void onDefaultTouchStart (GameLoopHtml self, GameLoopTouch glTouch) {
+//    window.console.info("Touch Start !");
+//    window.console.info(glTouch);
+//    window.alert("Touch Start !");
+  }
 
 }
