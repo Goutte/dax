@@ -77,6 +77,7 @@ abstract class Controller extends GameLoopHtml /*with EventEmitter*/ {
     onUpdate = onDefaultUpdate;
     onTouchStart = onDefaultTouchStart;
     onTouchMove = onDefaultTouchMove;
+    onTouchEnd = onDefaultTouchEnd;
 
     // Desactivate the mouse drag when mouse leaves the canvas
     // This is an ugly hack -- this belongs in the game loop.
@@ -128,6 +129,13 @@ abstract class Controller extends GameLoopHtml /*with EventEmitter*/ {
    * It is called on each drag of the [touch].
    */
   touch_dragged(GameLoopTouch touch) {}
+
+
+  /**
+   * Override this.
+   * It is called on each tap of the [touch].
+   */
+  touch_tapped(GameLoopTouch touch) {}
 
 
 
@@ -210,6 +218,16 @@ abstract class Controller extends GameLoopHtml /*with EventEmitter*/ {
 //    window.console.info("Touch Start !");
 //    window.console.info(glTouch);
 //    window.alert("Touch Start !");
+  }
+
+  void onDefaultTouchEnd (GameLoopHtml self, GameLoopTouch glTouch) {
+    var p0 = glTouch.positions[0];
+    var p1 = glTouch.positions[glTouch.positions.length-1];
+    var cumulated_length = pow(p1.x-p0.x,2) + pow(p1.y-p0.y,2);
+    //window.alert("Touch end ! ${cumulated_length} ; ${glTouch.positions.length.toString()}");
+    if (glTouch.positions.length < 10 && cumulated_length < 10) {
+      touch_tapped(glTouch);
+    }
   }
 
 }
